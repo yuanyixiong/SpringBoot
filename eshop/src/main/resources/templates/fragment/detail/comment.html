@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<!-- 翻页 -->
+<div class="bottom-pagination">
+    <nav>
+        <ul class="pagination">
+            <li th:unless="${pageInfo.isFirstPage}">
+                <a th:href="|javascript:loadComments('${pageInfo.firstPage}')|" aria-label="Next">
+                    <span aria-hidden="true">首页</span>
+                </a>
+            </li>
+            <li th:if="${pageInfo.hasPreviousPage}">
+                <a th:href="|javascript:loadComments('${pageInfo.prePage}')|" aria-label="Next">
+                    <span aria-hidden="true">上一页 &laquo;</span>
+                </a>
+            </li>
+            <li th:each="nav:${pageInfo.navigatepageNums}" th:classappend="${nav eq pageInfo.pageNum?'active':''}">
+                <a th:href="|javascript:loadComments('${nav}')|" th:text="${nav}">2</a></li>
+            <li th:if="${pageInfo.hasNextPage}">
+                <a th:href="|javascript:loadComments('${pageInfo.nextPage}')|" aria-label="Next">
+                    <span aria-hidden="true">下一页 &raquo;</span>
+                </a>
+            </li>
+            <li th:unless="${pageInfo.isLastPage}">
+                <a th:href="|javascript:loadComments('${pageInfo.lastPage}')|" aria-label="Next">
+                    <span aria-hidden="true">末页</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+<!-- 商品明细页面(detail)商品评价 jquery load 加载的模板 -->
+<div class="comment row" th:each="comment:${pageInfo.list}">
+    <div class="col-sm-3 author">
+        <div class="grade">
+            <span>评价</span>
+            <span class="reviewRating">
+                <i class="fa fa-star" th:if="${comment.commonRank%1 eq 0}"
+                   th:each="commonRank:${#numbers.sequence(1, comment.commonRank)}"></i>
+                <i class="fa fa-star" th:unless="${comment.commonRank%1 eq 0}"
+                   th:each="commonRank:${#numbers.sequence(1, comment.commonRank)}"></i>
+                <i class="fa" th:unless="${comment.commonRank%1 eq 0}"
+                   th:classappend="${comment.commonRank%1 eq 0?'fa-star':'fa-star-half-o'}"></i>
+            </span>
+        </div>
+        <div class="info-author">
+                <span>
+                    <strong th:text="${comment.user.userNicakName ne null?comment.user.userNicakName:comment.user.userLoginName}">胡小悠</strong>
+                </span>
+            <br/>
+            <em th:text="${#dates.format(comment.updateTime,'yyyy-MM-dd')}"></em>
+        </div>
+    </div>
+    <div class="col-sm-9 commnet-dettail" th:text="${comment.commonContent}"></div>
+</div>
+</body>
+</html>

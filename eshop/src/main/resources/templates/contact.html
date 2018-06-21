@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<!--CSS-->
+<head th:include="/fragment/css::css('轻实训电子商务平台-联系我们')"></head>
+<body class="category-page">
+<!-- 模态框 -->
+<div class="modal fade" id="messModal">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <!-- 模态框头部 -->
+            <div class="modal-header">
+                <h4 class="modal-title">提示</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <!-- 模态框主体 -->
+            <div class="modal-body">
+                <span id="mess"></span>
+            </div>
+            <!-- 模态框底部 -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- header头部 -->
+<header id="header" th:replace="fragment/header::header"></header>
+<div class="columns-container">
+    <div class="container" id="columns">
+        <div class="breadcrumb clearfix">
+            <a class="home" th:href="@{/}" title="Return to Home">首页</a>
+            <span class="navigation-pipe">&nbsp;</span>
+            <span class="navigation_page">联系我们</span>
+        </div>
+        <h2 class="page-heading">
+            <span class="page-heading-title2">联系我们</span>
+        </h2>
+        <div id="contact" class="page-content page-contact">
+            <div id="message-box-conact"></div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="contact-form-box">
+                        <form th:action="@{/contact/save}" method="post">
+                            <div class="form-selector">
+                                <label>内容</label>
+                                <select class="form-control input-sm" id="subject" name="contactContent">
+                                    <th:block th:if="${contact eq null or contact.contactContent eq 1}">
+                                        <option value="1" selected>售后服务</option>
+                                        <option value="2">网站管理员</option>
+                                    </th:block>
+                                    <th:block th:if="${contact ne null and contact.contactContent eq 2}">
+                                        <option value="1">售后服务</option>
+                                        <option value="2" selected>网站管理员</option>
+                                    </th:block>
+                                </select>
+                            </div>
+                            <div class="form-selector">
+                                <label>邮箱</label>
+                                <input type="text" class="form-control input-sm" id="email" name="contactEmail"
+                                       th:value="${contact ne null?contact.contactEmail:''}"/>
+                            </div>
+                            <div class="form-selector">
+                                <label>我要留言</label>
+                                <textarea class="form-control input-sm" rows="10" id="message"
+                                          name="contactMessage"
+                                          th:text="${contact ne null?contact.contactMessage:''}"></textarea>
+                            </div>
+                            <div class="form-selector">
+                                <button id="btn-send-contact" class="btn" type="submit">确定</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-6" id="contact_form_map">
+                    <h3 class="page-subheading">配送服务说明：</h3>
+                    <p>
+                        211限时达：当日上午11：00前提交的现货订单（部分城市为上午10点前），以订单出库完成拣货时间点开始计算，当日送达；夜里11：00前提交的现货订单（以订单出库后完成拣货时间点开始计算），次日15：00前送达。截至2015年7月31日，“211限时达”已覆盖全国135个区县。</p>
+                    <br/>
+                    <p>
+                        次日达：在一定时间点之前提交的现货订单（以订单出库后完成拣货的时间点开始计算），将于次日送达。截至2015年7月31日，“次日达”已覆盖全国951个区县。
+                    </p>
+                    <br/>
+                    <p>
+                        极速达：轻实训电子商务平台为消费者提供的一项个性化付费增值服务。消费者通过“在线支付”方式全额成功付款或“货到付款”方式成功提交订单，并勾选“极速达”服务后，轻实训电子商务平台会在服务时间内，3小时将商品送至消费者所留地址。目前，“极速达”业务在北京、上海、广州、成都、武汉、沈阳六个城市提供服务。
+                    </p>
+                    <br/>
+                    <ul class="store_info">
+                        <li><i class="fa fa-home"></i>湖北省武汉市金融港</li>
+                        <li><i class="fa fa-phone"></i><span>+8627 6552 2899 </span></li>
+                        <li><i class="fa fa-envelope"></i>邮箱: <span><a href="mailto:#">support@innovaee.com</a></span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 页底 -->
+<footer id="footer" th:replace="fragment/footer::footer"></footer>
+<a href="#" class="scroll_top" title="回到顶部">回到顶部</a>
+<!--JS-->
+<div th:replace="/fragment/js::js"></div>
+<script type="text/javascript" th:inline="javascript">
+    var responseData = /*[[${responseData}]]*/null;
+    if (responseData) {
+        $('#mess').text(responseData.data);
+        $('#messModal').modal('show');
+    }
+</script>
+</body>
+</html>

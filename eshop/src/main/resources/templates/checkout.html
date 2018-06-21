@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<!--CSS-->
+<head th:include="/fragment/css::css('轻实训电子商务平台-付款')"></head>
+<body class="category-page">
+<!-- 模态框（Modal）更改地址别名 -->
+<div class="modal fade" id="rename" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">更改地址别名</h4>
+            </div>
+            <div class="modal-body">
+                <input class="form-control" id="addresseId" type="hidden"/>
+                <label for="addresseName">地址别名：</label>
+                <input class="form-control" id="addresseName" type="text"/>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="editAddresseName()">提交更改
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 模态框 -->
+<div class="modal fade" id="messModal">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <!-- 模态框头部 -->
+            <div class="modal-header">
+                <h4 class="modal-title">提示</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <!-- 模态框主体 -->
+            <div class="modal-body">
+                <span id="mess"></span>
+            </div>
+            <!-- 模态框底部 -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- header头部 -->
+<header id="header" th:replace="fragment/header::header"></header>
+<div class="columns-container">
+    <div class="container" id="columns">
+        <div class="breadcrumb clearfix">
+            <a class="home" th:href="@{/}" title="Return to Home">首页</a>
+            <span class="navigation-pipe">&nbsp;</span>
+            <span class="navigation_page">结账</span>
+        </div>
+        <h2 class="page-heading">
+            <span class="page-heading-title2">结账</span>
+        </h2>
+        <form class="form-horizontal" method="post" th:action="@{/pay/placeOrder}" onsubmit="return checkData()">
+            <div class="page-content checkout-page">
+                <h3 class="checkout-sep">1. 配送信息</h3>
+                <table name="addresses" class="table table-bordered table-wishlist">
+                    <thead>
+                    <tr>
+                        <th>地址别名</th>
+                        <th>收件人</th>
+                        <th>联系方式</th>
+                        <th>详细地址</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="addresse,addresseEach:${addresses}"
+                        th:classappend="${defAddresse ne null and defAddresse.id eq addresse.id?'success':''}"
+                        th:index="${addresseEach.index}">
+                        <td th:text="${addresse.addressName}"></td>
+                        <td th:text="${addresse.addressRecipients}"></td>
+                        <td th:text="${addresse.addressPhone}"></td>
+                        <td>
+                            <span th:text="${addresse.state ne null? addresse.state.name:''}"></span>
+                            <span>&nbsp;&nbsp;</span>
+                            <span th:text="${addresse.province ne null? addresse.province.name:''}"></span>
+                            <span>&nbsp;&nbsp;</span>
+                            <span th:text="${addresse.city ne null? addresse.city.name:''}"></span>
+                            <span>&nbsp;&nbsp;</span>
+                            <span th:text="${addresse.town ne null? addresse.town.name:''}"></span>
+                            <span>&nbsp;&nbsp;</span>
+                            <span th:text="${addresse.addressLocation}"></span>
+                        </td>
+                        <td>
+                            <button id="rename" type="button" class="button" data-toggle="modal" data-target="#rename"
+                                    th:onclick="'javascript:setModalValues(\''+${addresse.id}+'\',\''+${addresse.addressName}+'\')'">
+                                修改别名
+                            </button>
+                            <button type="button" class="button" th:if="${defAddresse.id ne addresse.id}"
+                                    th:onclick="'javascript:setDefAddresse(\''+${addresse.id}+'\')'">设为默认
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td colspan="5">
+                            <button type="button" class="button" onclick="delAddresse()">删除地址</button>
+                            <button type="button" class="button" onclick="editAddresse()">编辑地址</button>
+                            <button type="button" class="button" onclick="addAddresse()">新增地址</button>
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
+                <div id="addresses" class="box-border hide">
+                    <h3 id="addresses_action" class="checkout-sep"></h3>
+                    <input class="form-control" type="hidden" id="addressId" name="addressId"
+                           th:value="${defAddresse ne null ? defAddresse.id:''}"/>
+                    <ul>
+                        <li class="row">
+                            <div class="form-group">
+                                <label for="addressRecipients" class="control-label col-sm-1">收件人</label>
+                                <div class="col-sm-5">
+                                    <input class="form-control" type="text" name="orderRecipients"
+                                           id="addressRecipients"
+                                           th:value="${defAddresse ne null ?  defAddresse.addressRecipients:''}">
+                                </div>
+                                <label class="required col-sm-1 control-label">国家</label>
+                                <div class="col-sm-5">
+                                    <div class="custom_select">
+                                        <select id="state" class="form-control"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="row">
+                            <div class="form-group">
+                                <label for="addressPhone" class="required col-sm-1 control-label">电话</label>
+                                <div class="col-sm-5">
+                                    <input class="form-control" type="text" name="addressPhone" id="addressPhone"
+                                           th:value="${defAddresse ne null ? defAddresse.addressPhone:''}"/>
+                                </div>
+                                <label class="required col-sm-1 control-label">省份</label>
+                                <div class="col-sm-5">
+                                    <div class="custom_select">
+                                        <select id="province" class="form-control"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="row">
+                            <div class="form-group">
+                                <label for="addressFaddrAxes" class=" col-sm-1 control-label">传真</label>
+                                <div class="col-sm-5">
+                                    <input class="form-control" type="text" id="addressFaddrAxes"
+                                           th:value="${defAddresse ne null ? defAddresse.addressFaddrAxes:''}"/>
+                                </div>
+                                <label class="required col-sm-1 control-label">城市</label>
+                                <div class="col-sm-5">
+                                    <div class="custom_select">
+                                        <select id="city" class="form-control"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="row">
+                            <div class="form-group">
+                                <label for="addressPostcode" class="required col-sm-1 control-label">邮政编码</label>
+                                <div class="col-sm-5">
+                                    <input class="form-control" type="text" name="addressPostcode"
+                                           id="addressPostcode"
+                                           th:value="${defAddresse ne null ? defAddresse.addressPostcode:''}"/>
+                                </div>
+                                <label class="required col-sm-1 control-label">区县</label>
+                                <div class="col-sm-5">
+                                    <div class="custom_select">
+                                        <select id="town" class="form-control"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="row">
+                            <div class="form-group">
+                                <label for="addressLocation" class="required col-sm-1 control-label">详细地址</label>
+                                <div class="col-sm-11">
+                                    <input class="form-control" type="text" name="addressLocation"
+                                           id="addressLocation"
+                                           th:value="${defAddresse ne null ? defAddresse.addressLocation:''}"/>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <button type="button" class="button" onclick="$('#addresses').addClass('hide')">关闭窗口</button>
+                    <button type="button" class="button" onclick="saveAddresse()">保存地址</button>
+                </div>
+            </div>
+            <div class="page-content checkout-page">
+                <h3 id="delivery" class="checkout-sep">2. 送货方式</h3>
+                <div class="box-border">
+                    <ul class="shipping_method">
+                        <li>
+                            <p class="subcaption bold">自取</p>
+                            <label for="radio_button_3">
+                                <input type="radio" checked="checked" id="radio_button_3" name="orderPaymentWay"
+                                       value="1">￥0
+                            </label>
+                        </li>
+                        <li>
+                            <p class="subcaption bold">送货上门</p>
+                            <label for="radio_button_4">
+                                <input type="radio" id="radio_button_4" name="orderPaymentWay" value="2">邮费 ￥5.00
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="page-content checkout-page">
+                <h3 class="checkout-sep">3. 付款信息</h3>
+                <div class="box-border">
+                    <ul>
+                        <li>
+                            <label for="radio_button_5">
+                                <input type="radio" checked="checked" id="radio_button_5" name="orderPaymentCash"
+                                       value="1">现金支付
+                            </label>
+                        </li>
+                        <li>
+                            <label for="radio_button_6">
+                                <input type="radio" id="radio_button_6" name="orderPaymentCash" value="2">信用卡支付
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="page-content checkout-page">
+                <h3 class="checkout-sep">4. 订单评审</h3>
+                <div class="box-border">
+                    <table class="table table-bordered table-responsive cart_summary">
+                        <thead>
+                        <tr>
+                            <th class="cart_product">物品</th>
+                            <th>描述</th>
+                            <th>库存</th>
+                            <th>单价</th>
+                            <th>购买数量</th>
+                            <th>总计</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="itme,itemEach:${buyerCart.items}" th:id="${itme.sku.id}">
+                            <td class="cart_product">
+                                <a th:href="@{/product/detail(productId=${itme.productId},skuId=${itme.sku.id})}">
+                                    <img th:src="${#image.getImage(itme.sku.skuImg)}">
+                                </a>
+                            </td>
+                            <td class="cart_description">
+                                <p class="product-name">
+                                    <a th:href="@{/product/detail(productId=${itme.productId},skuId=${itme.sku.id})}"
+                                       th:text="${itme.sku.skuName}">
+                                        衬衣
+                                    </a>
+                                </p>
+                                <small class="cart_ref" th:text="|编码：#${itme.sku.id}|">编码 : #123654999</small>
+                                <br>
+                                <small><a href="#" th:text="|颜色：${itme.sku.color.colorName}|">颜色 : 白色</a></small>
+                                <br>
+                                <small><a href="#" th:text="|尺码：${itme.sku.size.sizeName}|">尺码 : S</a></small>
+                                <input type="hidden" th:name="|items[${itemEach.index}].productId|" th:value="${itme.productId}"/>
+                                <input type="hidden" th:name="|items[${itemEach.index}].colorId|"th:value="${itme.sku.color.id}"/>
+                                <input type="hidden" th:name="|items[${itemEach.index}].sizeId|"th:value="${itme.sku.size.id}"/>
+                                <input type="hidden" th:name="|items[${itemEach.index}].orderItemName|"th:value="${itme.sku.skuName}"/>
+                                <input type="hidden" th:name="|items[${itemEach.index}].orderItemProice|"th:value="${itme.sku.skuPrice}"/>
+                                <input type="hidden" th:name="|items[${itemEach.index}].orderItemUrl|" th:value="${itme.sku.skuImg}"/>
+                                <input type="hidden" th:name="|items[${itemEach.index}].orderItemAmount|" th:value="${itme.amount}"/>
+                            </td>
+                            <td class="cart_avail">
+                                    <span class="label"
+                                          th:text="${itme.isHave eq true ? ((itme.sku.skuStock le 10 or itme.amount ge  itme.sku.skuStock)? '库存还剩:('+itme.sku.skuStock+')件':'有存货'):'无存货'}"
+                                          th:classappend="${itme.isHave eq true?((itme.sku.skuStock le 10 or itme.amount ge  itme.sku.skuStock) ? 'label-warning':'label-success'):'label-danger'}"
+                                    >有存货</span>
+                            </td>
+                            <td class="price" th:text="|￥${itme.sku.skuPrice}|"></td>
+                            <td class="qty" th:text="${itme.amount}"></td>
+                            <td class="price" th:text="|￥${itme.subtotal}|"></td>
+                        </tr>
+                        </tbody>
+                        <tfoot>
+                        <tr>
+                            <td colspan="2" rowspan="3"></td>
+                            <td colspan="3">运费(物流)</td>
+                            <td id="buyerCart" colspan="2">
+                                <span th:text="|￥${buyerCart.fee}|">￥118.00</span>
+                                <input type="hidden" name="orderDeliverFee" th:value="${buyerCart.fee}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">运费(送货上门)</td>
+                            <td colspan="2">
+                                <strong id="orderPaymentWay">￥0.00</strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="3"><strong>总产品(包括税收)</strong></td>
+                            <td id="productPrice" colspan="2">
+                                <strong th:text="|￥${buyerCart.productPrice}|">￥118.00</strong>
+                                <input type="hidden" name="orderPrice" th:value="${buyerCart.productPrice}"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="5"><strong>总计</strong></td>
+                            <td id="totalPrice" colspan="2">
+                                <strong th:text="|￥${buyerCart.totalPrice}|">￥118.00</strong>
+                                <input type="hidden" name="orderTotalFee" th:value="${buyerCart.totalPrice}"/>
+                            </td>
+                        </tr>
+                        </tfoot>
+                    </table>
+                    <button type="submit" class="button pull-right">下订单</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+<!-- 页底 -->
+<footer id="footer" th:replace="fragment/footer::footer"></footer>
+<a href="#" class="scroll_top" title="回到顶部">回到顶部</a>
+<!--JS-->
+<div th:replace="/fragment/js::js"></div>
+</body>
+<script type="text/javascript" th:inline="javascript">
+
+    ///配送信息
+    var addresse = /*[[${defAddresse}]]*/null;
+
+    //单击表格行
+    $("table[name='addresses'] tbody tr").on("click", function () {
+        $("table tbody tr").each(function (index, obj) {
+            $(obj).removeClass("success");
+        });
+        $(this).addClass("success");
+
+        //设置配送明细
+        var addresses = /*[[${addresses}]]*/null;
+        if (addresse) {
+            addresse = addresses[$(this).attr("index")];
+
+            //$("#userLoginName").val();
+            $("#addressId").val(addresse.id);
+            $("#addressRecipients").val(addresse.addressRecipients);
+            $("#addressPhone").val(addresse.addressPhone);
+            $("#addressFaddrAxes").val(addresse.addressFaddrAxes);
+            $("#addressPostcode").val(addresse.addressPostcode);
+            $("#addressLocation").val(addresse.addressLocation);
+
+            $("#state").find("option[code='" + addresse.stateId + "']").attr("selected", "selected").change();
+            $("#province").find("option[code='" + addresse.provinceId + "']").attr("selected", "selected").change();
+            $("#city").find("option[code='" + addresse.cityId + "']").attr("selected", "selected").change();
+            $("#town").find("option[code='" + addresse.townId + "']").attr("selected", "selected").change();
+        }
+    });
+
+    //加载国家
+    function loadState() {
+        $.ajax({
+            url: "/address/state/getStates",
+            data: $.param({}),
+            type: "get",
+            dataType: "json",
+            beforeSend: function () {
+                $("#state").empty();
+                $("#state").append($("<option selected='selected' code='-1'></option>").val("-1").text("----请选择----"));
+                return true;
+            },
+            success: function (responseData) {
+                if (responseData.status == "-1") {
+                    console.log("失败");
+                    console.log(responseData.data);
+                    return;
+                }
+                for (var i = 0; i < responseData.data.length; i++) {
+                    var $option = $("<option></option>").val(responseData.data[i].code).text(responseData.data[i].name).attr("code", responseData.data[i].id);
+                    $("#state").append($option);
+                }
+                if (addresse) {
+                    $("#state").find("option[code='" + addresse.stateId + "']").attr("selected", "selected").change();
+                }
+            },
+            error: function () {
+                console.log("失败");
+            }
+        });
+    }
+
+    //加载省份
+    function loadProvince(stateCode) {
+        $.ajax({
+            url: "/address/province/getProvinces",
+            data: $.param({"stateCode": stateCode}),
+            type: "get",
+            dataType: "json",
+            beforeSend: function () {
+                $("#province").empty();
+                $("#province").append($("<option selected='selected'></option>").val("-1").text("----请选择----"));
+                return true;
+            },
+            success: function (responseData) {
+                if (responseData.status == "-1") {
+                    console.log("失败");
+                    console.log(responseData.data);
+                    return;
+                }
+                for (var i = 0; i < responseData.data.length; i++) {
+                    var $option = $("<option></option>").val(responseData.data[i].code).text(responseData.data[i].name).attr("code", responseData.data[i].id);
+                    $("#province").append($option);
+                }
+                if (addresse) {
+                    $("#province").find("option[code='" + addresse.provinceId + "']").attr("selected", "selected").change();
+                }
+            },
+            error: function () {
+                console.log("失败");
+            }
+        });
+    }
+
+    //加载城市
+    function loadCity(provinceCode) {
+        $.ajax({
+            url: "/address/city/getCitys",
+            data: $.param({"provinceCode": provinceCode}),
+            type: "get",
+            dataType: "json",
+            beforeSend: function () {
+                $("#city").empty();
+                $("#city").append($("<option selected='selected'></option>").val("-1").text("----请选择----"));
+                return true;
+            },
+            success: function (responseData) {
+                if (responseData.status == "-1") {
+                    console.log("失败");
+                    console.log(responseData.data);
+                    return;
+                }
+                for (var i = 0; i < responseData.data.length; i++) {
+                    var $option = $("<option></option>").val(responseData.data[i].code).text(responseData.data[i].name).attr("code", responseData.data[i].id);
+                    $("#city").append($option);
+                }
+                if (addresse) {
+                    $("#city").find("option[code='" + addresse.cityId + "']").attr("selected", "selected").change();
+                }
+            },
+            error: function () {
+                console.log("失败");
+            }
+        });
+
+    }
+
+    //加载区县
+    function loadTown(cityCode) {
+        $.ajax({
+            url: "/address/town/getTowns",
+            data: $.param({"cityCode": cityCode}),
+            type: "get",
+            dataType: "json",
+            beforeSend: function () {
+                $("#town").empty();
+                $("#town").append($("<option selected='selected'></option>").val("-1").text("----请选择----"));
+                return true;
+            },
+            success: function (responseData) {
+                if (responseData.status == "-1") {
+                    console.log("失败");
+                    console.log(responseData.data);
+                    return;
+                }
+                for (var i = 0; i < responseData.data.length; i++) {
+                    var $option = $("<option></option>").val(responseData.data[i].code).text(responseData.data[i].name).attr("code", responseData.data[i].id);
+                    $("#town").append($option);
+                }
+                if (addresse) {
+                    $("#town").find("option[code='" + addresse.townId + "']").attr("selected", "selected").change();
+                }
+            },
+            error: function () {
+                console.log("失败");
+            }
+        });
+    }
+
+    $("#state").on("change", function () {
+        loadProvince($(this).val());
+        loadCity(-1);
+        loadTown(-1);
+    });
+    $("#province").on("change", function () {
+        loadCity($(this).val());
+        loadTown(-1);
+    });
+    $("#city").on("change", function () {
+        loadTown($(this).val());
+    });
+
+    $(function () {
+        //初始化国/省/市/区下拉框
+        $("#state").append($("<option selected='selected'></option>").val("-1").text("----请选择----"));
+        $("#province").append($("<option selected='selected'></option>").val("-1").text("----请选择----"));
+        $("#city").append($("<option selected='selected'></option>").val("-1").text("----请选择----"));
+        $("#town").append($("<option selected='selected'></option>").val("-1").text("----请选择----"));
+        loadState();
+    });
+
+
+    //地址操作
+    //删除选中地址
+    function delAddresse() {
+        $.ajax({
+            url: "/address/deleteAddress?id=" + $("#addressId").val(),
+            type: "delete",
+            dataType: "json",
+            success: function (responseData) {
+                if (responseData.status == "-1") {
+                    console.log("失败");
+                    console.log(responseData.data);
+                    return;
+                }
+                location.reload();
+            },
+            error: function () {
+                console.log("失败");
+            }
+        });
+    }
+
+    //编辑选中地址
+    function editAddresse() {
+        $("#addresses_action").text("编辑");
+        $("#addresses").removeClass("hide");
+    }
+
+    //添加地址
+    function addAddresse() {
+        $("#addresses_action").text("新增");
+        addresse = "";
+        $("#addressRecipients").val("");
+        $("#addressPhone").val("");
+        $("#addressFaddrAxes").val("");
+        $("#addressPostcode").val("");
+        $("#addressLocation").val("");
+
+        $("#state").change();
+        $("#addresses").removeClass("hide");
+    }
+
+
+    function checkAddresse() {
+        var stateId = $("#state").find("option:selected").attr("code");
+        var provinceId = $("#province").find("option:selected").attr("code");
+        var cityId = $("#city").find("option:selected").attr("code");
+        var townId = $("#town").find("option:selected").attr("code");
+        var addressLocation = $("#addressLocation").val();
+        var addressPhone = $("#addressPhone").val();
+        var addressRecipients = $("#addressRecipients").val();
+
+
+        if (stateId == undefined) {
+            $('#mess').text("请选择国家");
+            $('#messModal').modal('show');
+            return false;
+        }
+        if (provinceId == undefined) {
+            $('#mess').text("请选择省份");
+            $('#messModal').modal('show');
+            return false;
+        }
+        if (cityId == undefined) {
+            $('#mess').text("请选择城市");
+            $('#messModal').modal('show');
+            return false;
+        }
+        if (townId == undefined) {
+            $('#mess').text("请选择区县");
+            $('#messModal').modal('show');
+            return false;
+        }
+        if (addressRecipients == '') {
+            $('#mess').text("请填写收件人");
+            $('#messModal').modal('show');
+            return false;
+        }
+        if (addressPhone == '') {
+            $('#mess').text("请填写电话");
+            $('#messModal').modal('show');
+            return false;
+        }
+        if (addressLocation == '') {
+            $('#mess').text("请填写详细地址");
+            $('#messModal').modal('show');
+            return false;
+        }
+        return true;
+    }
+
+    //保存地址信息
+    function saveAddresse() {
+        if (checkAddresse()) {
+            if (addresse) {
+                //提交保存
+                $.ajax({
+                    url: "/address/editAddress",
+                    data: $.param({
+                        "id": $("#addressId").val(),
+                        "stateId": $("#state").find("option:selected").attr("code"),
+                        "provinceId": $("#province").find("option:selected").attr("code"),
+                        "cityId": $("#city").find("option:selected").attr("code"),
+                        "townId": $("#town").find("option:selected").attr("code"),
+                        "addressLocation": $("#addressLocation").val(),
+                        "addressPhone": $("#addressPhone").val(),
+                        "addressPostcode": $("#addressPostcode").val(),
+                        "addressFaddrAxes": $("#addressFaddrAxes").val(),
+                        "addressRecipients": $("#addressRecipients").val()
+                    }),
+                    type: "patch",
+                    dataType: "json",
+                    success: function (responseData) {
+                        if (responseData.status == "-1") {
+                            console.log("失败");
+                            console.log(responseData.data);
+                            return;
+                        }
+                        location.reload();
+                    },
+                    error: function () {
+                        console.log("失败");
+                    }
+                });
+            } else {
+                //提交修改
+                $.ajax({
+                    url: "/address/saveAddress",
+                    data: $.param({
+                        "userId": /*[[${session.currentUser.id}]]*/null,
+                        "stateId": $("#state").find("option:selected").attr("code"),
+                        "provinceId": $("#province").find("option:selected").attr("code"),
+                        "cityId": $("#city").find("option:selected").attr("code"),
+                        "townId": $("#town").find("option:selected").attr("code"),
+                        "addressLocation": $("#addressLocation").val(),
+                        "addressPhone": $("#addressPhone").val(),
+                        "addressPostcode": $("#addressPostcode").val(),
+                        "addressFaddrAxes": $("#addressFaddrAxes").val(),
+                        "addressRecipients": $("#addressRecipients").val()
+                    }),
+                    type: "post",
+                    dataType: "json",
+                    success: function (responseData) {
+                        if (responseData.status == "-1") {
+                            console.log("失败");
+                            console.log(responseData.data);
+                            return;
+                        }
+                        location.reload();
+                    },
+                    error: function () {
+                        console.log("失败");
+                    }
+                });
+            }
+            $("#addresses").addClass("hide");
+        }
+    }
+
+
+    //设置为默认地址
+    function setDefAddresse(id) {
+        $.ajax({
+            url: "/address/editAddress",
+            data: $.param({
+                "id": id,
+                "userId": /*[[${session.currentUser.id}]]*/null,
+                "addressIsDef": 2
+            }),
+            type: "patch",
+            dataType: "json",
+            success: function (responseData) {
+                if (responseData.status == "-1") {
+                    console.log("失败");
+                    console.log(responseData.data);
+                    return;
+                }
+                location.reload();
+            },
+            error: function () {
+                console.log("失败");
+            }
+        });
+    }
+
+    //修改别名
+    function editAddresseName() {
+        $.ajax({
+            url: "/address/editAddress",
+            data: $.param({
+                "id": $("#addresseId").val(),
+                "addressName": $("#addresseName").val()
+            }),
+            type: "patch",
+            dataType: "json",
+            success: function (responseData) {
+                if (responseData.status == "-1") {
+                    console.log("失败");
+                    console.log(responseData.data);
+                    return;
+                }
+                location.reload();
+            },
+            error: function () {
+                console.log("失败");
+            }
+        });
+    }
+
+    //送货方式
+    $("input[name='orderPaymentWay']").on("change", function () {
+        var totalPrice = /*[[${buyerCart.totalPrice}]]*/null;
+
+
+        if ($(this).val() == 1) {
+            $("#orderPaymentWay").text("￥0");
+            $("#totalPrice input").val(totalPrice);
+            $("#totalPrice strong").text("￥" + totalPrice);
+        } else {
+            $("#orderPaymentWay").text("￥5");
+            $("#totalPrice input").val(totalPrice + 5);
+            $("#totalPrice strong").text("￥" + (totalPrice + 5));
+        }
+    });
+
+    //验证数据
+    //必须提供物流地址
+    function checkData() {
+        if (addresse) {
+            return true;
+        }
+        $('#mess').text("请选择配送地址,没有请添加配送地址");
+        $('#messModal').modal('show');
+        return false;
+    }
+
+    function setModalValues(id, name) {
+        $("#addresseId").val(id);
+        $("#addresseName").val(name);
+    }
+</script>
+</html>

@@ -1,0 +1,681 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<!--//下拉框样式控制-->
+<style type="text/css">
+    .multiselect-container { /*下拉框的样式*/
+        width: 100%;
+    }
+
+    .multiselect-selected-text {
+        width: 100%;
+        float: left;
+        text-align: left;
+    }
+</style>
+<div class="tables-main">
+    <ol class="breadcrumb">
+        <li><a th:href="@{/index}">首页</a></li>
+        <li><a href="#">商品模块</a></li>
+        <li class="active"><a href="javascript:loadHTML('/shopping/mall/product/main')">商品管理</a></li>
+        <li th:switch="${action}">
+            <a href="#" th:case="add">添加</a>
+            <a href="#" th:case="edit">编辑</a>
+            <a href="#" th:case="info">详情</a>
+        </li>
+    </ol>
+
+    <!--//商品添加 tab-->
+    <div id="tabs" class="tabs graph">
+        <form class="form-horizontal">
+            <!--//tab切换按钮-->
+            <nav>
+                <ul>
+                    <li><a href="#section-1" class="icon-food"><i class="fa fa-cutlery"></i> <span>产品基本信息</span></a>
+                    </li>
+                    <li><a href="#section-1" class="icon-food"><i class="fa fa-cutlery"></i> <span>产品业务信息</span></a>
+                    </li>
+                    <li><a href="#section-2" class="icon-lab"><i class="fa fa-flask"></i> <span>产品描述</span></a></li>
+                    <li><a href="#section-3" class="icon-truck"><i class="fa fa-truck"></i> <span>产品详情</span></a></li>
+                    <li><a href="#section-4" class="icon-truck"><i class="fa fa-truck"></i> <span>售后保障</span></a></li>
+                </ul>
+            </nav>
+            <!--//tab页-->
+            <div class="content tab">
+                <!--产品基本信息-->
+                <section id="section-1">
+                    <div class="form-group  has-feedback col-xs-11">
+                        <label for="id" class="control-label">商品编号:</label>
+                        <input id="id" name="id" class="form-control" type="text" th:value="${#bean.getId()}" />
+                        <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                        <span class="sr-only">(error)</span>
+                    </div>
+                    <div class="form-group  has-feedback col-xs-11">
+                        <label for="productName" class="control-label">商品名称:</label>
+                        <input id="productName" name="productName" class="form-control" type="text"/>
+                        <span class="glyphicon  form-control-feedback" aria-hidden="true"></span>
+                        <span class="sr-only">(error)</span>
+                    </div>
+                    <div class="form-group  has-feedback col-xs-11">
+                        <label for="images" class="control-label">商品图片:</label>
+                        <div class="container kv-main">
+                            <div class="file-loading">
+                                <input id="images" name="files" type="file" multiple="multiple"/>
+                            </div>
+                        </div>
+                        <div id="productImages"></div>
+                    </div>
+                    <div class="form-group  has-feedback col-xs-11">
+                        <label for="brandModel" class="control-label">商品品牌:</label>
+                        <select id="brandModel" name="brandModel.id">
+                            <option th:unless="${action eq 'add'}" th:each="brand:${brands}" th:value="${brand.id}"
+                                    th:text="${brand.brandName}"
+                                    th:selected="${model.brandModel.id eq brand.id}"></option>
+                            <option th:if="${action eq 'add'}" th:each="brand:${brands}" th:value="${brand.id}"
+                                    th:text="${brand.brandName}"></option>
+                        </select>
+                        <span class="glyphicon  form-control-feedback" aria-hidden="true"></span>
+                        <span class="sr-only">(error)</span>
+                    </div>
+                    <div class="form-group  has-feedback col-xs-11">
+                        <label for="typeModel" class="control-label">商品类型:</label>
+                        <select id="typeModel" name="typeModel.id">
+                            <optgroup th:each="parent:${types}" th:if="${parent.typeParentId eq 'root'}"
+                                      th:label="${parent.typeName}">
+                                <option th:if="${(type.typeParentId eq parent.id) and (action eq 'add')}"
+                                        th:each="type:${types}" th:value="${type.id}"
+                                        th:text="${type.typeName}"></option>
+                                <option th:if="${(type.typeParentId eq parent.id) and (action ne 'add')}"
+                                        th:each="type:${types}" th:value="${type.id}" th:text="${type.typeName}"
+                                        th:selected="${model.typeModel.id eq type.id}"></option>
+                            </optgroup>
+                        </select>
+                        <span class="glyphicon  form-control-feedback" aria-hidden="true"></span>
+                        <span class="sr-only">(error)</span>
+                    </div>
+                    <div class="form-group  has-feedback col-xs-11">
+                        <label for="productColors" class="control-label">商品颜色集:</label>
+                        <select id="productColors" name="productColors" multiple="multiple">
+                            <optgroup th:each="parent:${colors}" th:if="${parent.colorParentId eq 'root'}"
+                                      th:label="${parent.colorName}">
+                                <option th:each="color:${colors}"
+                                        th:if="${(color.colorParentId eq parent.id) and ((action eq 'add') or (model eq null or model.productColors eq null))}"
+                                        th:value="${color.id}" th:text="${color.colorName}"></option>
+                                <option th:each="color:${colors}"
+                                        th:if="${(color.colorParentId eq parent.id) and (((action eq 'info' or action eq 'edit') and (color.colorParentId eq parent.id)) and (model.productColors ne null))}"
+                                        th:value="${color.id}"
+                                        th:selected="${#lists.contains(#strings.arraySplit(model.productColors,','),color.id)}"
+                                        th:text="${color.colorName}"></option>
+                            </optgroup>
+                        </select>
+                        <span class="glyphicon  form-control-feedback" aria-hidden="true"></span>
+                        <span class="sr-only">(error)</span>
+                    </div>
+                    <div class="form-group  has-feedback col-xs-11">
+                        <label for="productSizes" class="control-label">商品尺寸集:</label>
+                        <select id="productSizes" name="productSizes" multiple="multiple">
+                            <optgroup th:each="parent:${sizes}" th:if="${parent.sizeParentId eq 'root'}"
+                                      th:label="${parent.sizeName}">
+                                <option th:each="size:${sizes}"
+                                        th:if="${(size.sizeParentId eq parent.id) and ((action eq 'add') or (model eq null or model.productSizes eq null))}"
+                                        th:value="${size.id}" th:text="${size.sizeName}"></option>
+                                <option th:each="size:${sizes}"
+                                        th:if="${(size.sizeParentId eq parent.id) and (((action eq 'info' || action eq 'edit' ) and (size.sizeParentId eq parent.id)) and (model.productSizes ne null))}"
+                                        th:value="${size.id}"
+                                        th:selected="${#lists.contains(#strings.arraySplit(model.productSizes,','),size.id) }"
+                                        th:text="${size.sizeName}"></option>
+                            </optgroup>
+                        </select>
+                        <span class="glyphicon  form-control-feedback" aria-hidden="true"></span>
+                        <span class="sr-only">(error)</span>
+                    </div>
+                    <div class="form-group  has-feedback col-xs-11">
+                        <label for="productFeatures" class="control-label">商品属性集:</label>
+                        <select id="productFeatures" name="productFeatures" multiple="multiple">
+                            <option th:if="${(action eq 'info' || action eq 'edit') and model.productFeatures ne null}"
+                                    th:each="feature:${features}" th:value="${feature.id}"
+                                    th:text="${feature.featureName}"
+                                    th:selected="${#lists.contains(#strings.arraySplit(model.productFeatures,','),feature.id)}"></option>
+                            <option th:if="${(action eq 'add') or (model.productFeatures eq null)}"
+                                    th:each="feature:${features}" th:value="${feature.id}"
+                                    th:text="${feature.featureName}"></option>
+                        </select>
+                        <span class="glyphicon  form-control-feedback" aria-hidden="true"></span>
+                        <span class="sr-only">(error)</span>
+                    </div>
+                    <div class="form-group  has-feedback col-xs-11">
+                        <label for="productWeight" class="control-label">商品重量:</label>
+                        <input id="productWeight" name="productWeight" class="form-control" type="text"/>
+                        <span class="glyphicon  form-control-feedback" aria-hidden="true"></span>
+                        <span class="sr-only">(error)</span>
+                    </div>
+                    <div class="form-group  has-feedback col-xs-11">
+                        <label for="productSales" class="control-label">数量:</label>
+                        <input id="productSales" name="productSales" class="form-control" type="number" value="0"/>
+                        <span class="glyphicon  form-control-feedback" aria-hidden="true"></span>
+                        <span class="sr-only">(error)</span>
+                    </div>
+                    <div class="form-group  has-feedback col-xs-11"
+                         th:classappend="${(action eq 'add')or (action eq 'edit')?'hide':'' }">
+                        <label for="productCheckTime" class="control-label">审核时间:</label>
+                        <input id="productCheckTime" name="productCheckTime" class="form-control" type="date"/>
+                        <span class="glyphicon  form-control-feedback" aria-hidden="true"></span>
+                        <span class="sr-only">(error)</span>
+                    </div>
+                    <div class="form-group  has-feedback col-xs-11"
+                         th:classappend="${(action eq 'add')or (action eq 'edit')?'hide':'' }">
+                        <label for="createTime" class="control-label">创建时间:</label>
+                        <input id="createTime" name="createTime" class="form-control" type="date"/>
+                        <span class="glyphicon  form-control-feedback" aria-hidden="true"></span>
+                        <span class="sr-only">(error)</span>
+                    </div>
+                    <div class="form-group  has-feedback col-xs-11"
+                         th:classappend="${(action eq 'add')or (action eq 'edit')?'hide':'' }">
+                        <label for="updateTime" class="control-label">更新时间:</label>
+                        <input id="updateTime" name="updateTime" class="form-control" type="date"/>
+                        <span class="glyphicon  form-control-feedback" aria-hidden="true"></span>
+                        <span class="sr-only">(error)</span>
+                    </div>
+                </section>
+                <!--//产品业务信息-->
+                <section id="section-2">
+                    <div class="form-group  has-feedback col-xs-11">
+                        <div class="form-group  has-feedback col-xs-11">
+                            <label class="control-label">新品特惠:</label>
+                            <div class="radio-inline">
+                                <label>
+                                    <input type="radio" value="2" name="productIsNew" checked="checked"/>新品
+                                </label>
+                            </div>
+                            <div class="radio-inline">
+                                <label>
+                                    <input type="radio" value="1" name="productIsNew"/>旧品
+                                </label>
+                            </div>
+                            <span class="glyphicon  form-control-feedback" aria-hidden="true"></span>
+                            <span class="sr-only">(error)</span>
+                        </div>
+                        <div class="form-group  has-feedback col-xs-11">
+                            <label class="control-label">是否畅销:</label>
+                            <div class="radio-inline">
+                                <label>
+                                    <input type="radio" value="2" name="productIsHot" checked="checked"/>畅销
+                                </label>
+                            </div>
+                            <div class="radio-inline">
+                                <label>
+                                    <input type="radio" value="1" name="productIsHot"/>不畅销
+                                </label>
+                            </div>
+                            <span class="glyphicon  form-control-feedback" aria-hidden="true"></span>
+                            <span class="sr-only">(error)</span>
+                        </div>
+                        <div class="form-group  has-feedback col-xs-11">
+                            <label class="control-label">是否推荐:</label>
+                            <div class="radio-inline">
+                                <label>
+                                    <input type="radio" value="2" name="productIsCommend" checked="checked"/>推荐
+                                </label>
+                            </div>
+                            <div class="radio-inline">
+                                <label>
+                                    <input type="radio" value="1" name="productIsCommend"/>不推荐
+                                </label>
+                            </div>
+                            <span class="glyphicon  form-control-feedback" aria-hidden="true"></span>
+                            <span class="sr-only">(error)</span>
+                        </div>
+                        <div class="form-group  has-feedback col-xs-11">
+                            <label class="control-label">是否上架:</label>
+                            <div class="radio-inline">
+                                <label>
+                                    <input type="radio" value="2" name="productIsShow"/>上架
+                                </label>
+                            </div>
+                            <div class="radio-inline">
+                                <label>
+                                    <input type="radio" value="1" name="productIsShow" checked="checked"/>下架
+                                </label>
+                            </div>
+                            <span class="glyphicon  form-control-feedback" aria-hidden="true"></span>
+                            <span class="sr-only">(error)</span>
+                        </div>
+                        <div class="form-group  has-feedback col-xs-11">
+                            <label class="control-label">是否移除:</label>
+                            <div class="radio-inline">
+                                <label>
+                                    <input type="radio" value="2" name="isDel" checked="checked"/>未删
+                                </label>
+                            </div>
+                            <div class="radio-inline">
+                                <label>
+                                    <input type="radio" value="1" name="isDel"/>已删
+                                </label>
+                            </div>
+                            <span class="glyphicon  form-control-feedback" aria-hidden="true"></span>
+                            <span class="sr-only">(error)</span>
+                        </div>
+                    </div>
+                </section>
+                <!--//产品描述-->
+                <section id="section-3">
+                    <div class="form-group  has-feedback col-xs-11">
+                        <label for="productDescription" class="control-label">产品描述:</label>
+                        <div id="productDescription" class="form-group  has-feedback col-xs-11 summernote"></div>
+                        <input id="productDescriptionText" name="productDescription" class="form-control"
+                               type="hidden"/>
+                    </div>
+                </section>
+                <!--//产品详情-->
+                <section id="section-4">
+                    <div class="form-group  has-feedback col-xs-11">
+                        <label for="productInformation" class="control-label">产品详情:</label>
+                        <div id="productInformation" class="form-group  has-feedback col-xs-11 summernote"></div>
+                        <input id="productInformationText" name="productInformation" class="form-control"
+                               type="hidden"/>
+                    </div>
+                </section>
+                <!--//售后保障-->
+                <section id="section-5">
+                    <div class="form-group  has-feedback col-xs-11">
+                        <label for="productAfterSale" class="control-label">产品详情:</label>
+                        <div id="productAfterSale" class="form-group  has-feedback col-xs-11 summernote"></div>
+                        <input id="productAfterSaleText" name="productAfterSale" class="form-control" type="hidden"/>
+                    </div>
+                </section>
+                <!--//提交表单按钮-->
+                <div class="col-xs-8">
+                    <button type="button" class="btn btn-success" th:if="${action eq 'add' or action eq 'edit'}"
+                            sign="save">保存
+                    </button>
+                    <button type="button" class="btn btn-info" sign="back">返回</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="clearfix"></div>
+</div>
+<script type="text/javascript">
+    var nginxVisitURL = "http://127.0.0.1:9001/"; //文件访问地址
+</script>
+<!--bootstrap summernote文本编辑器-->
+<script type="text/javascript">
+    function initEdit(id, imageUrl, placeholder) {
+        $(id).summernote({
+            lang: "zh-CN",
+            minHeight: 300,
+            focus: true,
+            tabSize: 2,
+            placeholder: placeholder,
+            toolbar: [
+                ['style', ['fontname', 'style']],
+                ['font', ['bold', 'underline', 'clear']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['insert', ['table', 'link', 'picture',]],
+                ['view', ['fullscreen', 'help']]
+            ],
+            callbacks: {
+                onImageUpload: function (files, editor, $editable) {
+                    sendFile(files[0], id, imageUrl)
+                }
+            }
+        });
+    }
+
+    //提交文件到服务器处理
+    function sendFile(file, id, imageUrl) {
+        var data = new FormData();
+        data.append("files", file);
+        //增加额外的参数
+        $.ajax({
+            data: data,
+            type: "POST",
+            url: imageUrl,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: function (responseData) {
+                $(id).summernote('insertImage', nginxVisitURL + responseData.data[0].imgUrl, 'image name'); // the insertImage API
+            }
+        });
+    }
+</script>
+<!--tab JS-->
+<script th:src="@{/plugins/bootstrap/tab/cbpFWTabs.js}"></script>
+<!--模块JS公共变量-->
+<script type="text/javascript" th:inline="javascript">
+    //商品模块from页面链接操作的url
+    var saveUrl = "/shopping/mall/product/save"; //保存、修改公用此URL
+    var mainUrl = "/shopping/mall/product/main"; //返回模块主页面的URL
+    var inspectRepeatUrl = "/shopping/mall/product/inspectRepeat"; //编号重复验证的URL
+
+    // 活动类型
+    var action = [[${action}]];
+
+    //初始化tab
+    new CBPFWTabs($("#tabs"));
+</script>
+<!--bootstrap summernote 文本编辑器插件 -->
+<script type="text/javascript">
+    //初始化文本编辑器-产品描述
+    initEdit("#productDescription", "/shopping/mall/img/uploadFile", "产品描述....");
+    //初始化文本编辑器-产品详情
+    initEdit("#productInformation", "/shopping/mall/img/uploadFile", "产品详情....");
+    //初始化文本编辑器-售后保障
+    initEdit("#productAfterSale", "/shopping/mall/img/uploadFile", "售后保障....");
+</script>
+<!--bootstrap fileinput 文件上传控件 -->
+<script type="text/javascript" th:inline="javascript">
+    //当前Map为自定义的数据类型，操作类似Java中的Map
+    var images = new Map();//定义一个全局变量去接收上传成功的文件
+
+    $(function () {
+
+        var urls = new Array();//图片数组
+        var infos = new Array();//图片信息数组
+
+        var model = /*[[${model}]]*/null;
+        //加载图片数据
+        if (model != null) {
+            var imgModels = /*[[${model==null?null:model.imgModel}]]*/null;
+            //初始化加载图片-组装图片数组
+            for (var i in imgModels) {
+                urls.push(nginxVisitURL + imgModels[i].imgUrl.split(",")[0]);
+            }
+            //初始化加载图片-组装图片信息数组
+            for (var i in imgModels) {
+                var info = {
+                    "caption": imgModels[i].imgName,
+                    "size": imgModels[i].size,
+                    "width": "120px",
+                    "url": "/shopping/mall/img/deleteProductFile",
+                    "key": imgModels[i].id,
+                    "extra": {"url": imgModels[i].imgUrl.split(",")[0]}
+                };
+                infos.push(info);
+            }
+            //初始化加载图片-设置页面数组
+            for (var i in imgModels) {
+                images.put(imgModels[i].id, imgModels[i]);
+            }
+        }
+
+        $("#images").fileinput({
+            language: 'zh',//设置语言
+            enctype: 'multipart/form-data',//请求提交方式
+            uploadAsync: true, //默认异步上传
+            uploadUrl: '/shopping/mall/img/uploadProductFile',//上传的地址
+            allowedFileExtensions: ["jpg", "jpeg", "gif", "png", "bmp"], //接收的文件后缀
+            removeFromPreviewOnError: true, //当选择的文件不符合规则时，例如不是指定后缀文件、大小超出配置等，选择的文件不会出现在预览框中，只会显示错误信息
+            showCaption: false,//是否显示标题
+            showUpload: false, //是否显示上传按钮
+            showRemove: false, //显示移除按钮
+            showPreview: true, //是否显示预览
+            showBrowse: action == "info" ? false : true,//是否显示选择图片按钮
+            showCancel: false,//是否显示取消上传按钮
+            showClose: false,//是否显示关闭按钮
+            maxFileSize: 1024 * 10,//单位为kb，如果为0表示不限制文件大小
+            maxFileCount: 4, //表示允许同时上传的最大文件个数
+            msgFilesTooMany: "选择上传的文件数量({n}) 超过允许的最大数值{m}！",
+            initialPreviewAsData: true,//允许初始化加载图片
+            initialPreviewFileType: 'image',
+            initialPreview: urls,//加载图片的地址
+            initialPreviewConfig: infos,//加载图片的信息
+            overwriteInitial: false, //不覆盖已存在的图片
+            layoutTemplates: action == "info" ? {
+                actionDrag: '',//去除图片上的移动按钮
+                actionDelete: ''//去除图片上的删除按钮
+            } : {actionDrag: ''}
+        });
+
+        //上传
+        //异步上传返回结果处理[成功]
+        $("#images").on("fileuploaded", function (event, responseData, key) {
+            //上传成功后添加图片进map
+            images.put(key, responseData.response.data[0]);
+        });
+
+        //删除
+        //异步删除[加载]的图片
+        $("#images").on('filepredelete', function (event, key, jqXHR, data) {
+            if (!confirm("确定删除该图片?")) {
+                return false;
+            }
+            deleteImage(key);
+        });
+        //异步删除[新加入][未上传]的图片
+        $("#images").on('filepreremove', function (event, key, index) {
+            if (!confirm("确定删除该图片?")) {
+                return false;
+            }
+            images.remove(key);
+        });
+        //异步删除[新加入][已上传]的图片
+        $("#images").on('filesuccessremove', function (event, key) {
+            if (!confirm("确定删除该图片?")) {
+                return false;
+            }
+            deleteImage(key);
+        });
+
+    });
+
+    /**
+     * 删除功能
+     * @param key 数据编号 map
+     */
+    function deleteImage(key) {
+        $.ajax({
+            url: "/shopping/mall/img/deleteProductFile",
+            type: "post",
+            data: $.param({"url": images.get(key).imgUrl}),
+            dataType: "json",
+            success: function (responseData) {
+                if (responseData.status == "-1") {
+                    console.log("删除失败：");
+                    return;
+                }
+                //删除map中指定的图片
+                images.remove(key);
+            },
+            error: function () {
+                console.log("失败：");
+            }
+        });
+    }
+</script>
+<!--表单数据初始化-->
+<script type="text/javascript" th:inline="javascript" th:if="${model}">
+    var $model;
+    $(function () {
+        if (action == "info" || action == "edit") {
+            //加载数据
+            //取出页面的表单dom
+            $model = [
+                $("#id"),
+                $("#productName"),
+                $("#brandModel"),
+                $("#typeModel"),
+                $("#productColors"),
+                $("#productSizes"),
+                $("#productFeatures"),
+                $("#productWeight"),
+                $("#productSales"),
+                $("input[name='productIsNew']"),
+                $("input[name='productIsHot']"),
+                $("input[name='productIsCommend']"),
+                $("input[name='productIsShow']"),
+                $("input[name='isDel']"),
+                $("#productCheckTime"),
+                $("#createTime"),
+                $("#updateTime")
+            ];
+        }
+
+        //浏览详情，需要赋值
+        if (action == "info" || action == "edit") {
+
+            //给表单dom赋值
+            $model[0].val(/*[[${model.id}]]*/null);
+            $model[1].val(/*[[${model.productName}]]*/null);
+
+            //2-6下拉框html部分进行控制
+
+            $model[7].val(/*[[${model.productWeight}]]*/null);
+            $model[8].val(/*[[${model.productSales}]]*/null);
+
+            //单选
+            if (/*[[${model.productIsNew eq 1}]]*/null) {
+                $model[9].filter("[type='radio'][name='productIsNew'][value='1']").attr("checked", true);
+            } else {
+                $model[9].filter("[type='radio'][name='productIsNew'][value='2']").attr("checked", true);
+            }
+            if (/*[[${model.productIsHot eq 1}]]*/null) {
+                $model[10].filter("[type='radio'][name='productIsHot'][value='1']").attr("checked", true);
+            } else {
+                $model[10].filter("[type='radio'][name='productIsHot'][value='2']").attr("checked", true);
+            }
+            if (/*[[${model.productIsCommend eq 1}]]*/null) {
+                $model[11].filter("[type='radio'][name='productIsCommend'][value='1']").attr("checked", true);
+            } else {
+                $model[11].filter("[type='radio'][name='productIsCommend'][value='2']").attr("checked", true);
+            }
+            if (/*[[${model.productIsShow eq 1}]]*/null) {
+                $model[12].filter("[type='radio'][name='productIsShow'][value='1']").attr("checked", true);
+            } else {
+                $model[12].filter("[type='radio'][name='productIsShow'][value='2']").attr("checked", true);
+            }
+            if (/*[[${model.isDel eq 1}]]*/null) {
+                $model[13].filter("[type='radio'][name='isDel'][value='1']").attr("checked", true);
+            } else {
+                $model[13].filter("[type='radio'][name='isDel'][value='2']").attr("checked", true);
+            }
+            //日期
+            if (/*[[${model.productCheckTime}]]*/null) {
+                $model[14].val(new Date(/*[[${model.productCheckTime}]]*/).format("yyyy-MM-dd"));
+            }
+            if (/*[[${model.createTime}]]*/null) {
+                $model[15].val(new Date(/*[[${model.createTime}]]*/).format("yyyy-MM-dd"));
+            }
+            if (/*[[${model.updateTime}]]*/null) {
+                $model[16].val(new Date(/*[[${model.updateTime}]]*/).format("yyyy-MM-dd"));
+            }
+
+            //初始化文本编辑器数据
+            $("#productDescription").summernote('code', /*[[${model.productDescription}]]*/null);
+            $("#productInformation").summernote('code', /*[[${model.productInformation}]]*/null);
+            $("#productAfterSale").summernote('code', /*[[${model.productAfterSale}]]*/null);
+        }
+    });
+</script>
+<!--//bootstrap select下来框-->
+<script type="text/javascript">
+    /**
+     * 构建下拉框基础配置
+     * @param id DOM ID
+     * @param callback 下拉框显示的内容格式函数
+     * @param nSelectedText 选择多个的提示文本
+     */
+    function createSelect(id, callback, nSelectedText) {
+        $(function () {
+            $(id).multiselect({
+                buttonClass: 'btn btn-link',
+                buttonWidth: '100%',//按钮宽度
+                includeFilterClearBtn: false,//关闭清理按钮
+                selectedClass: 'multiselect-selected',//选中项样式
+                optionLabel: function (element) {
+                    return callback(element);
+                },
+                enableClickableOptGroups: true,//同时取组或者all
+                enableCollapsibleOptGroups: true,//组可折叠
+                enableFiltering: true,//过滤
+                filterPlaceholder: '查询',
+                filterBehavior: 'text',//根据value或者text过滤
+                enableFullValueFiltering: true,//能否全字匹配
+                enableCaseInsensitiveFiltering: true,//不区分大小写
+                includeSelectAllOption: true,//全选
+                nonSelectedText: "请选择",
+                nSelectedText: nSelectedText,
+                allSelectedText: "已全选",
+                selectAllText: '全选',//全选的checkbox名称
+                selectAllNumber: true,//true显示[已全选(n)]/[请选择],false显示allselect
+                dropRight: true,//摆放在左侧默认为200
+                maxHeight: "300"
+            });
+        });
+    }
+
+    //商品品牌
+    funBrand = function (element) {
+        return $(element).html() + '(' + $(element).val() + ')';
+    }
+    createSelect("#brandModel", funBrand, "种品牌被选中");
+    //商品类型
+    funType = function (element) {
+        return $(element).html() + '(' + $(element).val() + ')';
+    }
+    createSelect("#typeModel", funType, "种类型被选中");
+    //构建颜色选择下拉框
+    funProductColors = function (element) {
+        return $(element).html() + '(' + $(element).val() + ')';
+    }
+    createSelect("#productColors", funProductColors, "种颜色被选中");
+
+    //构建尺寸选择下拉框
+    funProductSizes = function (element) {
+        return $(element).html() + '(' + $(element).val() + ')';
+    }
+    createSelect("#productSizes", funProductSizes, "种尺寸被选中");
+
+    //构建属性选择下拉框
+    funProductFeatures = function (element) {
+        return $(element).html() + '(' + $(element).val() + ')';
+    }
+    createSelect("#productFeatures", funProductFeatures, "种属性被选中");
+</script>
+<!--//提交保存,js控制图片插件，编辑器插件及普通表单数据提交-->
+<script type="text/javascript">
+    $(function () {
+        $("button[class*='btn-success']").on("click", function () {
+            $('#productDescriptionText').val($('#productDescription').summernote('code'));
+            $('#productInformationText').val($('#productInformation').summernote('code'));
+            $('#productAfterSaleText').val($('#productAfterSale').summernote('code'));
+
+            $('#productImages').html("");
+            var i = 0;
+            images.eachMap(function (key, value) {
+                $('#productImages').append(initImageFrom(key, i++, value))
+            })
+        });
+    })
+
+    function initImageFrom(id, index, image) {
+        var id = $("<input  name='imgModel[" + index + "].id' class='form-control' type='hidden' />");
+        var imgUrl = $("<input  name='imgModel[" + index + "].imgUrl' class='form-control' type='hidden' />");
+        var imgName = $("<input  name='imgModel[" + index + "].imgName' class='form-control' type='hidden' />");
+        var isDel = $("<input  name='imgModel[" + index + "].isDel' class='form-control' type='hidden'/>");
+        var imgIsDef = $("<input  name='imgModel[" + index + "].imgIsDef' class='form-control' type='hidden'/>");
+        var createTime = $("<input  name='imgModel[" + index + "].createTime' class='form-control' type='hidden'/>");
+        var updateTime = $("<input  name='imgModel[" + index + "].updateTime' class='form-control' type='hidden'/>");
+
+        id.val(image.id);
+        imgUrl.val(image.imgUrl);
+        imgName.val(image.imgName);
+        isDel.val(image.isDel);
+        imgIsDef.val(index == 0 ? 2 : 1);
+        createTime.val(image.createTime);
+        updateTime.val(image.updateTime);
+
+        $('#productImages').append(id);
+        $('#productImages').append(imgUrl);
+        $('#productImages').append(imgName);
+        $('#productImages').append(isDel);
+        $('#productImages').append(imgIsDef);
+        $('#productImages').append(createTime);
+        $('#productImages').append(updateTime);
+    }
+</script>
+<!--//表单页面通用JS 表单数据初始化-->
+<script type="text/javascript" th:inline="javascript" th:src="@{/js/fromInit.js}" th:if="${model}"></script>
+<!--//表单页面通用JS 表单事件-->
+<script type="text/javascript" th:inline="javascript" th:src="@{/js/fromClick.js}"></script>

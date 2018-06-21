@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration
+  PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+	<context id="testTables" targetRuntime="MyBatis3">
+		<plugin type="org.mybatis.generator.plugins.SerializablePlugin"></plugin>
+		<plugin type="org.mybatis.generator.plugins.ToStringPlugin" />
+
+		<!-- 开启支持内存分页 可生成 支持内存分布的方法及参数 <plugin type="org.mybatis.generator.plugins.RowBoundsPlugin" /> -->
+		<!-- generate entity时，生成hashcode和equals方法 <plugin type="org.mybatis.generator.plugins.EqualsHashCodePlugin" /> -->
+		<!-- 此处是将Example改名为Criteria 当然 想改成什么都行~ -->
+		<plugin type="org.mybatis.generator.plugins.RenameExampleClassPlugin">
+			<property name="searchString" value="Example$" />
+			<!-- 替换后 <property name="replaceString" value="Criteria" /> -->
+			<property name="replaceString" value="Criteria" />
+		</plugin>
+
+
+
+
+		<!--数据库连接的信息：驱动类、连接地址、用户名、密码 -->
+		<jdbcConnection driverClass="com.mysql.jdbc.Driver" connectionURL="jdbc:mysql://localhost:3306/eshop?characterEncoding=UTF-8&amp;serverTimezone=Hongkong" userId="root" password="root">
+		</jdbcConnection>
+		<!-- <jdbcConnection driverClass="oracle.jdbc.OracleDriver" connectionURL="jdbc:oracle:thin:@127.0.0.1:1521:aaaa"
+			userId="aaaa" password="aaaa"> </jdbcConnection> -->
+
+		<!-- 默认false，把JDBC DECIMAL 和 NUMERIC 类型解析为 Integer，为 true时把JDBC DECIMAL
+			和 NUMERIC 类型解析为java.math.BigDecimal -->
+		<javaTypeResolver>
+			<property name="forceBigDecimals" value="false" />
+		</javaTypeResolver>
+
+		<!-- targetProject:生成PO类的位置 -->
+		<javaModelGenerator targetPackage="online.shixun.demo.eshop.dto" targetProject=".\src\main\java">
+			<!-- enableSubPackages:是否让schema作为包的后缀 -->
+			<property name="enableSubPackages" value="false" />
+			<!-- 从数据库返回的值被清理前后的空格 -->
+			<property name="trimStrings" value="true" />
+		</javaModelGenerator>
+
+		<!-- targetPackage：mapper接口生成的位置 -->
+		<javaClientGenerator type="ANNOTATEDMAPPER" targetPackage="online.shixun.demo.eshop.module.collect.mapper" targetProject=".\src\main\java">
+			<!-- enableSubPackages:是否让schema作为包的后缀 -->
+			<property name="enableSubPackages" value="true" />
+		</javaClientGenerator>
+
+
+
+		<!--商品模块
+		<table schema="" tableName="eshop_product" domainObjectName="EshopProduct" />
+		<table schema="" tableName="eshop_type" domainObjectName="EshopType" />
+		<table schema="" tableName="eshop_color" domainObjectName="EshopColor" />
+		<table schema="" tableName="eshop_img" domainObjectName="EshopImg" />
+		<table schema="" tableName="eshop_sku" domainObjectName="EshopSku" />
+		<table schema="" tableName="eshop_feature" domainObjectName="EshopFeature" />
+		<table schema="" tableName="eshop_size" domainObjectName="EshopSize" />
+-->
+
+		<!--购物车模块
+		<table schema="" tableName="eshop_buyer_cart" domainObjectName="EshopBuyerCart" />
+		<table schema="" tableName="eshop_buyer_cart_item" domainObjectName="EshopBuyerCartItem" />
+-->
+		<!--订单模块
+		<table schema="" tableName="eshop_order" domainObjectName="EshopOrder" /
+		<table schema="" tableName="eshop_order_item" domainObjectName="EshopOrderItem" />
+>-->
+		<!--收藏模块
+		<table schema="" tableName="eshop_collect" domainObjectName="EshopCollect" />
+		<table schema="" tableName="eshop_collect_item" domainObjectName="EshopCollectItem" />
+-->
+
+		<!--品牌模块
+		<table schema="" tableName="eshop_brand" domainObjectName="EshopBrand" />
+-->
+
+		<!--商品评论模块
+		<table schema="" tableName="eshop_comment" domainObjectName="EshopComment" />
+-->
+
+		<!--系统反馈模块
+		<table schema="" tableName="eshop_contact" domainObjectName="EshopContact" />
+-->
+
+		<!--用户模块
+		<table schema="" tableName="eshop_user" domainObjectName="EshopUser" />
+		<table schema="" tableName="eshop_role" domainObjectName="EshopRole" />
+		<table schema="" tableName="eshop_resource" domainObjectName="EshopResource" />
+		<table schema="" tableName="eshop_address" domainObjectName="EshopAddress" />
+-->
+		<!--地域模块
+		<table schema="" tableName="eshop_address_state" domainObjectName="EshopAddressState" />
+		<table schema="" tableName="eshop_address_province" domainObjectName="EshopAddressProvince" />
+		<table schema="" tableName="eshop_address_city" domainObjectName="EshopAddressCity" />
+		<table schema="" tableName="eshop_address_town" domainObjectName="EshopAddressTown" />
+-->
+		<!--热门活动
+		<table schema="" tableName="eshop_activity" domainObjectName="EshopActivity" />
+-->
+		<!--轮播图
+		<table schema="" tableName="eshop_slideshow" domainObjectName="EshopSlideshow" />
+-->
+		<!--关于我们
+		<table schema="" tableName="eshop_about" domainObjectName="EshopAbout" />
+-->
+	</context>
+</generatorConfiguration>

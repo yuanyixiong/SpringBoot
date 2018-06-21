@@ -1,0 +1,88 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<div class="tables-main">
+    <ol class="breadcrumb">
+        <li><a th:href="@{/index}">首页</a></li>
+        <li><a href="#">系统模块</a></li>
+        <li class="active"><a href="javascript:loadHTML('/system/resource/main')">资源管理</a></li>
+        <li><a href="#" id="triggerInfo">桌面列表</a></li>
+    </ol>
+    <div class="chrt-inner grid-1">
+
+        <div class="form-body ">
+            <div data-example-id="simple-form-inline">
+                <form class="form-inline" th:action="@{/system/resource/getPages}" method="get">
+                    <input type="hidden" class="form-control" name="page" value="0" id="page" />
+                    <input id="is_del" type="hidden" class="form-control" name="isDel" th:value="2" />
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="id" placeholder="资源编码" />
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="resourceParentId" placeholder="资源父级编码" />
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="resourceName" placeholder="资源名称" />
+                    </div>
+                    <button type="button" class="btn btn-success" sign="search">查询</button>
+                    <button type="button" class="btn btn-info" sign="new">添加</button>
+                    <button type="button" class="btn btn-warning" sign="trigger">回收站</button>
+                </form>
+            </div>
+        </div>
+        <!--//这里显示数据-->
+        <table class="table table-hover">
+            <thead>
+            <tr class="info">
+                <th>序号</th>
+                <th>资源编码</th>
+                <th>资源父级编码</th>
+                <th>资源名称</th>
+                <th>是否移除</th>
+                <th>资源排序索引</th>
+                <th>资源图标样式</th>
+                <th>资源click链接地址</th>
+                <th>最近更新时间</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody id="data">
+            </tbody>
+        </table>
+        <!--//这里显示分页-->
+        <div id="pagination" class="pagination"></div>
+    </div>
+    <div class="clearfix"></div>
+</div>
+<!--模块独有特性 JS -->
+<script type="text/javascript" th:inline="javascript">
+    //系统资源模块main页面链接操作的url
+    var saveUrl = "/system/resource/from?action=add";//添加-跳转from页面URL,且指定多动类型为add
+    var editUrl = "/system/resource/from?action=edit";//编辑-跳转from页面URL,且指定多动类型为edit
+    var infoUrl = "/system/resource/from?action=info";//详情-跳转from页面URL,且指定多动类型为info
+    var getPagesUrl = "/system/resource/getPages";//模块分页的URL
+    var deleteUrlReal = "/system/resource/deleteReal";//分页列表真删除的URL
+    var deleteUrlFake = "/system/resource/deleteFake";//分页列表假删除的URL
+    var deleteUrlRestore="/system/resource/deleteUrlRestore";//分页列表删除的还原URL
+
+    //控制分页列表的按钮
+    var buttons=new Buttons(true,true,true,false,false,false,false);
+
+    /**
+     * 初始化一行数据
+     * @param model 单个数据对象
+     * @param serialNumber 当前行的序号
+     * @returns {Array}
+     */
+    function initRowValues(model, serialNumber) {
+        var id = model.id;
+        var resourceParentId = model.resourceParentId;
+        var resourceName = model.resourceName;
+        var isDel = model.isDel==1?"已删":"未删";
+        var resourceIndex = model.resourceIndex;
+        var resourceIco = model.resourceIco;
+        var resourceUrl = model.resourceUrl;
+        var createTime = model.createTime == null ? new Date().NULL : new Date(model.createTime).format("yyyy-MM-dd hh:mm:ss");
+        return new Array(serialNumber, id, resourceParentId, resourceName,isDel, resourceIndex, resourceIco, resourceUrl, createTime, id);
+    }
+</script>
+<!--模块分页通用JS-->
+<script type="text/javascript" th:inline="javascript" th:src="@{/js/index.js}"></script>

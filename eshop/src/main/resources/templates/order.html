@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<!--CSS-->
+<head th:include="/fragment/css::css('轻实训电子商务平台-购物车')"></head>
+<body class="category-page">
+<!-- 模态框 -->
+<div class="modal fade" id="messModal">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <!-- 模态框头部 -->
+            <div class="modal-header">
+                <h4 class="modal-title">提示</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <!-- 模态框主体 -->
+            <div class="modal-body">
+                <span id="mess"></span>
+            </div>
+            <!-- 模态框底部 -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- header头部 -->
+<header id="header" th:replace="fragment/header::header"></header>
+<div class="columns-container">
+    <div class="container" id="columns">
+        <div class="breadcrumb clearfix">
+            <a class="home" th:href="@{/}" title="Return to Home">首页</a>
+            <span class="navigation-pipe">&nbsp;</span>
+            <span class="navigation_page">你的购物车</span>
+        </div>
+        <h2 class="page-heading no-line">
+            <span class="page-heading-title2">购物车的总结</span>
+        </h2>
+        <div class="page-content page-order">
+            <ul class="step">
+                <li class="current-step"><span>01. 总结</span></li>
+                <li><span>02. 登陆</span></li>
+                <li><span>03. 收货地址</span></li>
+                <li><span>04. 快递方式</span></li>
+                <li><span>05. 付款</span></li>
+            </ul>
+            <div class="heading-counter warning">你的购物车包含:
+                <span th:value="${buyerCart.productAmount}"
+                      th:text="|${buyerCart.productAmount}物品|">2 物品</span>
+            </div>
+            <div class="order-detail-content">
+                <table class="table table-bordered table-responsive cart_summary">
+                    <thead>
+                    <tr>
+                        <th class="cart_product">物品</th>
+                        <th>描述</th>
+                        <th>库存</th>
+                        <th>单价</th>
+                        <th>数量</th>
+                        <th>总计</th>
+                        <th class="action"><i class="fa fa-trash-o"></i></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="itme:${buyerCart.items}" th:id="${itme.sku.id}"
+                        th:classappend="${itme.sku.skuStock lt itme.amount ?'danger':''}">
+                        <td class="cart_product">
+                            <a th:href="@{/product/detail(productId=${itme.productId},skuId=${itme.sku.id})}">
+                                <img th:src="${#image.getImage(itme.sku.skuImg)}"></a>
+
+                        </td>
+                        <td class="cart_description">
+                            <p class="product-name"><a
+                                    th:href="@{/product/detail(productId=${itme.productId},skuId=${itme.sku.id})}"
+                                    th:text="${itme.sku.skuName}">衬衣 </a></p>
+                            <small class="cart_ref" th:text="|编码：#${itme.sku.id}|">编码 : #123654999</small>
+                            <br>
+                            <small><a href="#" th:text="|颜色：${itme.sku.color.colorName}|">颜色 : 白色</a></small>
+                            <br>
+                            <small><a href="#" th:text="|尺码：${itme.sku.size.sizeName}|">尺码 : S</a></small>
+                        </td>
+                        <td class="cart_avail">
+                                    <span class="label"
+                                          th:text="${itme.isHave eq true ? ((itme.sku.skuStock le 10 or itme.amount ge  itme.sku.skuStock)? '库存还剩:('+itme.sku.skuStock+')件':'有存货'):'无存货'}"
+                                          th:classappend="${itme.isHave eq true?((itme.sku.skuStock le 10 or itme.amount ge  itme.sku.skuStock) ? 'label-warning':'label-success'):'label-danger'}"
+                                    >有存货</span>
+                        </td>
+                        <td class="price"><span th:text="|￥${itme.sku.skuPrice}|"
+                                                th:value="${itme.sku.skuPrice}">￥59.00</span></td>
+                        <td class="qty">
+                            <input th:id="|${itme.sku.id}_input|" type="text" th:value="${itme.amount}"/>
+                            <a th:href="|javascript:up('${itme.sku.id}','${itme.id}','${itme.sku.skuStock}')|"><i
+                                    class="fa fa-caret-up"></i></a>
+                            <a th:href="|javascript:down('${itme.sku.id}','${itme.id}','${itme.sku.skuStock}')|"><i
+                                    class="fa fa-caret-down"></i></a>
+                        </td>
+                        <td class="price">
+                            <span th:text="|￥${itme.subtotal}|" th:value="${itme.subtotal}">￥59.00</span>
+                        </td>
+                        <td class="action">
+                            <a th:href="|javascript:removeItem('${itme.sku.id}','${itme.id}')|">删除</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td colspan="2" rowspan="2"></td>
+                        <td colspan="3">运费</td>
+                        <td id="buyerCart" colspan="2" th:text="|￥${buyerCart.fee}|">￥118.00</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3"><strong>总产品(包括税收)</strong></td>
+                        <td id="productPrice" colspan="2" th:text="|￥${buyerCart.productPrice}|">￥118.00</td>
+                    </tr>
+                    <tr>
+                        <td colspan="5"><strong>总计</strong></td>
+                        <td colspan="2"><strong id="totalPrice" th:text="|￥${buyerCart.totalPrice}|">￥118.00</strong>
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
+                <div class="cart_navigation">
+                    <a class="prev-btn" th:href="@{/product/category}">继续购物</a>
+                    <a class="next-btn" onclick="return toOrder()"
+                       th:href="@{/pay/main(id=${session.currentUser ne null?session.currentUser.id:''})}">结账</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 页底 -->
+<footer id="footer" th:replace="fragment/footer::footer"></footer>
+<a href="#" class="scroll_top" title="回到顶部">回到顶部</a>
+<!--JS-->
+<div th:replace="/fragment/js::js"></div>
+<script type="text/javascript" th:inline="javascript">
+
+    function toOrder() {
+        if (!/*[[${buyerCart.productAmount}]]*/0) {
+            $('#mess').text("当前购物车没有商品，无需结账");
+            $('#messModal').modal('show');
+            return false
+        }
+        if ($("table tbody tr[class*='danger']").length > 0) {
+            $('#mess').text("当前购物车,存在库存不足情况,无法下订单");
+            $('#messModal').modal('show');
+            return false
+        }
+        return true
+    }
+
+    function removeItem(skuId, id) {
+        $.ajax({
+            url: "/trolley/removeItem",
+            data: $.param({"skuId": skuId, "id": id}),
+            type: "get",
+            dataType: "json",
+            success: function (responseData) {
+                if (responseData.status == "-1") {
+                    console.log("失败");
+                    console.log(responseData.data);
+                    return;
+                }
+                $("#" + skuId).remove();
+                calculatePrice();
+                $("#trolley").load("/trolley/toSimpleList");
+            },
+            error: function () {
+                console.log("失败");
+            }
+        });
+    }
+
+    /**
+     * 计算页面商品金额
+     */
+    function calculatePrice() {
+        var productPrice = 0.0;
+        $("tbody tr").each(function (index, obj) {
+            var price = $($("tbody tr:eq(" + index + ") td.price span")[0]).attr("value");
+            var number = $($("tbody tr:eq(" + index + ") td.qty input")[0]).val();
+            var subtotal = price * number;//单类型商品小计
+            productPrice += subtotal;//购物车商品总计
+            $($("tbody tr:eq(" + index + ") td.price span")[1]).attr("value", subtotal).text("￥" + subtotal.toFixed(1));
+        });
+
+        var buyerCart = productPrice > 0 && productPrice < 79 ? 5 : 0; //满了79包邮
+        var totalPrice = buyerCart + productPrice;
+
+        $("#buyerCart").text("￥" + buyerCart.toFixed(1));
+        $("#productPrice").text("￥" + productPrice.toFixed(1));
+        $("#totalPrice").text("￥" + totalPrice.toFixed(1));
+    }
+
+
+    function down(skuId, id, skuStock) {
+        var num = parseInt($("#" + skuId + "_input").val()) - 1;
+        if (num == 0) {
+            if (!confirm("移除商品?")) {
+                return;
+            }
+            removeItem(skuId, id);
+        } else {
+            $("#" + skuId + "_input").val(num)
+        }
+        if (num <= skuStock) {
+            $("#" + skuId + "_input").parent().parent().removeClass("danger");
+        }
+        $.ajax({
+            url: "/trolley/down",
+            data: $.param({"skuId": skuId, "id": id}),
+            type: "get",
+            dataType: "json",
+            success: function (responseData) {
+                if (responseData.status == "-1") {
+                    console.log("失败");
+                    console.log(responseData.data);
+                    return;
+                }
+                calculatePrice();
+                $("#trolley").load("/trolley/toSimpleList");
+            },
+            error: function () {
+                console.log("失败");
+            }
+        });
+    }
+
+    function up(skuId, id, skuStock) {
+        var num = parseInt($("#" + skuId + "_input").val()) + 1;
+        $("#" + skuId + "_input").val(num);
+        if (num > skuStock) {
+            $("#" + skuId + "_input").parent().parent().addClass("danger");
+        }
+        $.ajax({
+            url: "/trolley/up",
+            data: $.param({"skuId": skuId, "id": id}),
+            type: "get",
+            dataType: "json",
+            success: function (responseData) {
+                if (responseData.status == "-1") {
+                    console.log("失败");
+                    console.log(responseData.data);
+                    return;
+                }
+                calculatePrice();
+                $("#trolley").load("/trolley/toSimpleList");
+            },
+            error: function () {
+                console.log("失败");
+            }
+        });
+    }
+
+</script>
+</body>
+</html>

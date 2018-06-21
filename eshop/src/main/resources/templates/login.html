@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<!--CSS-->
+<head th:include="/fragment/css::css('轻实训电子商务平台-登陆')"></head>
+<style type="text/css">
+    .progress {
+        z-index: 2000;
+        width: 40%;
+        height: auto;
+        opacity: 0.7;
+    }
+
+    .hide {
+        display: none;
+    }
+
+    .mask {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1000;
+        background-color: #000000;
+        opacity: 0.2;
+    }
+</style>
+<body class="category-page">
+<!-- 模态框 -->
+<div class="modal fade" id="messModal">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <!-- 模态框头部 -->
+            <div class="modal-header">
+                <h4 class="modal-title">提示</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <!-- 模态框主体 -->
+            <div class="modal-body">
+                <span id="mess"></span>
+            </div>
+            <!-- 模态框底部 -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- header头部 -->
+<header id="header" th:replace="fragment/header::header"></header>
+<div class="columns-container">
+    <div class="container" id="columns">
+        <div class="breadcrumb clearfix">
+            <a class="home" th:href="@{/}" title="Return to Home">首页</a>
+            <span class="navigation-pipe">&nbsp;</span>
+            <span class="navigation_page">身份验证</span>
+        </div>
+        <h2 class="page-heading">
+            <span class="page-heading-title2">身份验证</span>
+        </h2>
+        <div class="page-content">
+            <div class="row">
+                <div class="col-sm-6 col-xs-12">
+                    <div class="box-authentication">
+                        <h3>申请一个账户</h3>
+                        <p>请输入您的邮箱来申请一个账户</p>
+                        <label for="emmail_register">邮箱地址</label>
+                        <input id="emmail_register" type="text" class="form-control"/>
+                        <button class="button" id="register">
+                            <i class="fa fa-user"></i>
+                            申请账户
+                        </button>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xs-12">
+                    <div class="box-authentication">
+                        <div th:if="${param.error}">
+                            <div class="alert alert-danger">
+                                无效的用户名和密码.
+                            </div>
+                        </div>
+                        <div th:if="${param.logout}">
+                            <div class="alert alert-info">
+                                您已经注销了登陆信息.
+                            </div>
+                        </div>
+                        <form th:action="@{/login}" method="post">
+                            <h3>登录</h3>
+                            <label for="emmail_login">邮箱</label>
+                            <input id="emmail_login" type="text" class="form-control" name="userLoginName"/>
+                            <label for="password_login">密码</label>
+                            <input id="password_login" type="password" class="form-control" name="userPassword"/>
+                            <p class="forgot-pass"><a href="#">忘记密码?</a></p>
+                            <button class="button" type="submit"><i class="fa fa-lock"></i> 登陆</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 页底 -->
+<footer id="footer" th:replace="fragment/footer::footer"></footer>
+<a href="#" class="scroll_top" title="回到顶部">回到顶部</a>
+<!--JS-->
+<div th:replace="/fragment/js::js"></div>
+<!--进度条-->
+<img id="progressImgage" class="progress hide" th:src="${#image.getImage('ajax-loader.gif')}"/>
+<div id="maskOfProgressImage" class="mask hide"></div>
+</body>
+<script type="text/javascript">
+
+    //对Jquery Ajax 方法进行扩展,提交带进度条
+    $(function () {
+        $.ajax2 = function (img, bg, options) {
+            var $img = $("#" + img);
+            var $bg = $("#" + bg);
+            $img.removeClass("hide");
+            $bg.removeClass("hide");
+
+            var complete = options.complete;
+            options.complete = function (httpRequest, status) {
+                $img.addClass("hide");
+                $bg.addClass("hide");
+                if (complete) {
+                    complete(httpRequest, status);
+                }
+            };
+            options.async = true;
+            $img.show().css({
+                "position": "fixed",
+                "top": "50%",
+                "left": "50%",
+                "margin-top": function () {
+                    return -1 * $img.height() / 2;
+                },
+                "margin-left": function () {
+                    return -1 * $img.width() / 2;
+                }
+            });
+            $.ajax(options);
+        };
+    });
+
+    $("#register").on("click", function () {
+        $.ajax2("progressImgage", "maskOfProgressImage", {
+            url: "/user/register",
+            data: $.param({"email": $("#emmail_register").val()}),
+            type: "post",
+            dataType: "json",
+            async: true,
+            success: function (responseData) {
+                if (responseData.status == "-1") {
+                    console.log("失败");
+                    console.log(responseData.data);
+                    return;
+                }
+                $('#mess').text(responseData.data);
+                $('#messModal').modal('show');
+            },
+            error: function () {
+                console.log("失败");
+            }
+        });
+    });
+</script>
+</html>

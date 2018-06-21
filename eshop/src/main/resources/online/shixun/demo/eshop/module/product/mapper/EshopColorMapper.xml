@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="online.shixun.demo.eshop.module.product.mapper.EshopColorMapper">
+
+    <!--//图片的ResultMap基础配置-->
+    <resultMap id="colorBaseResultMap" type="online.shixun.demo.eshop.dto.EshopColor">
+        <id column="color_id" property="id"></id>
+        <result column="color_is_del" property="isDel"></result>
+        <result column="color_create_time" property="createTime"></result>
+        <result column="color_update_time" property="updateTime"></result>
+        <result column="color_name" property="colorName"></result>
+        <result column="color_parent_id" property="colorParentId"></result>
+        <result column="color_img_url" property="colorImgUrl"></result>
+    </resultMap>
+
+    <!--颜色的基础列:连表改名SQL-->
+    <sql id="colorBaseJoinRenameSQL">
+        color.`id` as color_id,
+        color.`is_del` as color_is_del,
+        color.`create_time`  as color_create_time,
+        color.`update_time` as color_update_time,
+        color.`color_name`,
+        color.`color_parent_id`,
+        color.`color_img_url`
+    </sql>
+    <!--颜色的基础列:单表未改名SQL-->
+    <sql id="colorBaseUnJoinRenameSQL">
+        color.`id`,
+        color.`is_del`,
+        color.`create_time`,
+        color.`update_time`,
+        color.`color_name`,
+        color.`color_parent_id`,
+        color.`color_img_url`
+    </sql>
+
+</mapper>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.com">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="box-border box-wishlist">
+    <div>
+        <a href="javascript:initCollect(2,1,'all')" action="all"
+           th:classappend="${action} eq 'all' ? 'text-primary bold':''">
+            全部收藏
+            <span class="text-primary bold"></span>
+        </a>
+        <span>&nbsp;&nbsp;</span>
+        <a href="javascript:initCollect(1,1,'attention')" action="attention"
+           th:classappend="${action} eq 'attention'?'text-primary bold':''">回收站</a>
+    </div>
+    <div class="form-inline">
+        <select id="condition_time" class="form-control">
+            <option value="1" th:selected="${timeEnumIndex eq 1}">近三个月内</option>
+            <option value="2" th:selected="${timeEnumIndex eq 2}">近半年内</option>
+            <option value="3" th:selected="${timeEnumIndex eq 3}">今年内</option>
+            <option value="4" th:selected="${timeEnumIndex eq 4}">2017年</option>
+            <option value="5" th:selected="${timeEnumIndex eq 5}">2016年</option>
+            <option value="6" th:selected="${timeEnumIndex eq 6}">2015年</option>
+            <option value="7" th:selected="${timeEnumIndex eq 7}">更多...</option>
+            <option value="8" th:selected="${timeEnumIndex eq 8}">自定义</option>
+        </select>
+        <input id="beginTime" name="beginTime" type="date" class="form-control input hide" placeholder="开始"
+               th:value="${#dates.format(beginTime,'yyyy-MM-dd')}"/>
+        <input id="endTime" name="endTime" type="date" class="form-control input hide" placeholder="结束"
+               th:value="${#dates.format(endTime,'yyyy-MM-dd')}"/>
+        <button id="query" class="button btn-xs">查询</button>
+    </div>
+</div>
+<!-- 翻页 -->
+<div class="col-sm-12">
+    <div class="bottom-pagination">
+        <nav>
+            <ul class="pagination">
+                <li th:unless="${pageInfo.isFirstPage}">
+                    <a th:href="|javascript:loadCollects('${pageInfo.firstPage}')|" aria-label="Next">
+                        <span aria-hidden="true">首页</span>
+                    </a>
+                </li>
+                <li th:if="${pageInfo.hasPreviousPage}">
+                    <a th:href="|javascript:loadCollects('${pageInfo.prePage}')|" aria-label="Next">
+                        <span aria-hidden="true">上一页 &laquo;</span>
+                    </a>
+                </li>
+                <li th:each="nav:${pageInfo.navigatepageNums}" th:classappend="${nav eq pageInfo.pageNum?'active':''}">
+                    <a th:href="|javascript:loadCollects('${nav}')|" th:text="${nav}">2</a></li>
+                <li th:if="${pageInfo.hasNextPage}">
+                    <a th:href="|javascript:loadCollects('${pageInfo.nextPage}')|" aria-label="Next">
+                        <span aria-hidden="true">下一页 &raquo;</span>
+                    </a>
+                </li>
+                <li th:unless="${pageInfo.isLastPage}">
+                    <a th:href="|javascript:loadCollects('${pageInfo.lastPage}')|" aria-label="Next">
+                        <span aria-hidden="true">末页</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+<table class="table table-bordered table-hover table-wishlist">
+    <thead>
+    <tr>
+        <th>收藏编码</th>
+        <th>收藏别名</th>
+        <th>商品数量</th>
+        <th>查看次数</th>
+        <th>创建日期</th>
+        <th>更新日期</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="item:${pageInfo.list}">
+        <td th:text="${item.id}"></td>
+        <td th:text="${item.collectName}">我的清单</td>
+        <td th:text="${item.collectNumber}">7</td>
+        <td th:text="${item.collectViewcount}">0</td>
+        <td th:text="${#dates.format(item.updateTime,'yyyy-MM-dd')}">2015-06-18</td>
+        <td th:text="${#dates.format(item.createTime,'yyyy-MM-dd')}">2015-06-18</td>
+        <td class="text-center">
+            <a th:href="|javascript:open('${item.id}')|">
+                <i class="fa fa-folder-open"></i>
+            </a>
+            <!--还原-->
+            <span th:if="${item.isDel eq 1}">&nbsp;</span>
+            <a th:if="${item.isDel eq 1}" th:href="|javascript:restoreDelete('${item.id}')|">
+                <i class="glyphicon glyphicon-share-alt"></i>
+            </a>
+            <span>&nbsp;</span>
+            <!--假删-->
+            <a th:if="${item.isDel eq 2}" th:href="|javascript:fakeDelete('${item.id}')|">
+                <i class="fa fa-close"></i>
+            </a>
+            <!--真删-->
+            <a th:if="${item.isDel eq 1}" th:href="|javascript:realDelete('${item.id}')|">
+                <i class="fa fa-close"></i>
+            </a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<script type="text/javascript" th:inline="javascript">
+    var action = /*[[${action}]]*/null;//当前正在进行的操作类型
+
+    function initCollect(isDel, pageNum, action) {
+        //条件
+        var condition_time = $("#condition_time").val();
+        var beginTime = $("#beginTime").val();
+        var endTime = $("#endTime").val();
+
+        if (condition_time == 8) {
+            if (beginTime == 'undefined' || endTime == 'undefined' || beginTime == undefined || endTime == undefined || beginTime == null || endTime == null || beginTime == '' || endTime == '') {
+                alert("请指定检索的开始时间和结束时间");
+                return;
+            }
+        }
+
+        var condition_param = $.param({
+            "isDel": isDel,
+            "userId": userId,
+            "beginTime": beginTime,
+            "endTime": endTime,
+            "pageNum": pageNum,
+            "timeEnumIndex": condition_time,
+            "action": action
+        });
+
+        //jQuery load 收藏列表
+        $("#table").load("/collect/getCollects?" + condition_param, function () {
+            //jQuery load 收藏列表项
+            $("#table tbody tr:eq(0)").addClass("success");
+            var collectId = $("#table tbody tr td:eq(0)").text();
+            $("#item").load("/collectItem/getCollectItems?collectId=" + collectId);
+        });
+    }
+
+    //查询单击事件
+    $("#query").on("click", function () {
+        initCollect(action == 'attention' ? 1 : 2, 1, action);
+    });
+
+    //控制时间表单
+    function selectedTime() {
+        var condition_time = $("#condition_time").val();
+        if (condition_time == 8) {
+            $("#beginTime").removeClass("hide");
+            $("#endTime").removeClass("hide");
+        } else {
+            $("#beginTime").addClass("hide");
+            $("#endTime").addClass("hide");
+        }
+    }
+
+    $("#condition_time").on("change", function () {
+        selectedTime();
+    });
+
+    //单击表格行
+    $("table tbody tr").on("click", function () {
+        $("table tbody tr").each(function (index, obj) {
+            $(obj).removeClass("success")
+        });
+        $(this).addClass("success");
+    });
+
+    //单击开启
+    function open(id) {
+        $("#item").load("/collectItem/getCollectItems?collectId=" + id);
+    }
+
+    //单击删除-假删
+    function fakeDelete(id) {
+        $.ajax({
+            url: "/collect/fakeDelete",
+            data: $.param({"id": id}),
+            type: "get",
+            dataType: "json",
+            success: function (responseData) {
+                if (responseData.status == "-1") {
+                    console.log("失败");
+                    console.log(responseData.data);
+                    return;
+                }
+                initCollect(2, 1, action);
+            },
+            error: function () {
+                console.log("失败");
+            }
+        });
+    }
+
+    //单击删除-真删
+    function realDelete(id) {
+        $.ajax({
+            url: "/collect/realDelete",
+            data: $.param({"id": id}),
+            type: "get",
+            dataType: "json",
+            success: function (responseData) {
+                if (responseData.status == "-1") {
+                    console.log("失败");
+                    console.log(responseData.data);
+                    return;
+                }
+                initCollect(1, 1, action);
+            },
+            error: function () {
+                console.log("失败");
+            }
+        });
+    }
+
+    //单击还原-还原假删
+    function restoreDelete(id) {
+        $.ajax({
+            url: "/collect/restoreDelete",
+            data: $.param({"id": id}),
+            type: "get",
+            dataType: "json",
+            success: function (responseData) {
+                if (responseData.status == "-1") {
+                    console.log("失败");
+                    console.log(responseData.data);
+                    return;
+                }
+                initCollect(1, 1, action);
+            },
+            error: function () {
+                console.log("失败");
+            }
+        });
+    }
+
+
+    $(function () {
+        selectedTime();
+    });
+
+    //翻页
+    function loadCollects(pageNum) {
+        initCollect(action == 'attention' ? 1 : 2, pageNum, action);
+    }
+</script>
+</body>
+</html>

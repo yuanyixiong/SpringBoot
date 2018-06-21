@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<!--CSS-->
+<head th:include="/fragment/css::css('轻实训电子商务平台-产品详情')"></head>
+<style type="text/css">
+    .optColor {
+        box-shadow: 0px 0px 5px 0px white inset;
+        border-radius: 10px;
+    }
+</style>
+<body class="product-page">
+<!-- 模态框 -->
+<div class="modal fade" id="messModal">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <!-- 模态框头部 -->
+            <div class="modal-header">
+                <h4 class="modal-title">提示</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <!-- 模态框主体 -->
+            <div class="modal-body">
+                <span id="mess"></span>
+            </div>
+            <!-- 模态框底部 -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- header头部 -->
+<header id="header" th:replace="fragment/header::header"></header>
+<div class="columns-container">
+    <div class="container" id="columns">
+        <div class="breadcrumb clearfix">
+            <a class="home" th:href="@{/}" title="Return to Home">首页</a>
+            <th:block th:each="parent:${parents}" th:if="${parent.id ne 'root'}">
+                <span class="navigation-pipe">&nbsp;</span>
+                <a th:href="@{/product/category(classifyChecked=${parent.id})}" title="Return to Home"
+                   th:text="${parent.typeName}">时尚</a>
+            </th:block>
+        </div>
+        <div class="row">
+            <div class="column col-xs-12 col-sm-3" id="left_column">
+                <div class="block left-module">
+                    <p class="title_block">分类</p>
+                    <div class="block_content">
+                        <div class="layered layered-category">
+                            <div class="layered-content">
+                                <ul id="classify" class="tree-menu">
+                                    <!--//jQuery Ajax加载产品分类-->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="hot" class="block left-module">
+                    <!--//jQuery load 加载畅销产品-->
+                </div>
+                <div id="commend" class="block left-module">
+                    <!--//jQuery load 加载店家推荐-->
+                </div>
+                <div id="new" class="block left-module">
+                    <!--//jQuery load 加载新品特惠-->
+                </div>
+                <div class="col-left-slide left-module detail-banner">
+                    <div class="banner-opacity">
+                        <a href="#"><img src="/images/detail-banner.jpg"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="center_column col-xs-12 col-sm-9" id="center_column">
+                <div id="product">
+                    <div class="primary-box row">
+                        <!--商品图片显示区域:每张图片的顺序为 大,中,小-->
+                        <!--/images/product-s4-850x1036.jpg,/images/product-s4-420x512.jpg,/images/product-s4-100x122.jpg-->
+                        <div class="pb-left-column col-xs-12 col-sm-6">
+                            <div class="product-image">
+                                <div class="product-full">
+                                    <img id="product-zoom"
+                                         th:src="${#image.getImage(product.imgs[0].imgUrl,1)}"
+                                         th:data-zoom-image="${#image.getImage(product.imgs[0].imgUrl,0)}"
+                                    />
+                                </div>
+                                <div class="product-img-thumb" id="gallery_01">
+                                    <ul class="owl-carousel" data-items="3" data-nav="true" data-dots="false"
+                                        data-margin="20" data-loop="true">
+                                        <li th:each="img:${product.imgs}">
+                                            <a href="#"
+                                               th:data-image="${#image.getImage(img.imgUrl,1)}"
+                                               th:data-zoom-image="${#image.getImage(img.imgUrl,0)}"
+                                            >
+                                                <img id="product-zoom"
+                                                     th:src="${#image.getImage(img.imgUrl,2)}"/>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <!--商品详情显示区域-->
+                        <div class="pb-right-column col-xs-12 col-sm-6">
+                            <h1 class="product-name" th:text="${product.productName}">棉麻上衣加挂饰</h1>
+                            <div class="product-comments">
+                                <div class="product-star" id="skuRankImg"></div>
+                                <div class="comments-advices">
+                                    <a href="#" id="skuRankNumber">评级：3</a>
+                                    <a href="#"><i class="fa fa-pencil"></i>评论</a>
+                                </div>
+                            </div>
+                            <div class="product-price-group">
+                                <span class="price" id="price">￥38.95</span>
+                                <span class="old-price" id="old-price">￥52.00</span>
+                                <span class="discount" id="discount">-30%</span>
+                            </div>
+                            <div class="info-orther">
+                                <p>编号#<span id="code" class="in-stock"></span></p>
+                                <p>库存:<span id="repertory" class="in-stock"></span></p>
+                                <p>
+                                    款式:
+                                    <span class="in-stock" th:if="${product.productIsNew eq 2}">新品</span>
+                                    <span class="in-stock" th:if="${product.productIsHot eq 2}">畅销</span>
+                                    <span class="in-stock" th:if="${product.productIsCommend eq 2}">推荐</span>
+                                </p>
+                            </div>
+                            <div class="product-desc" th:utext="${product.productDescription}"></div>
+                            <div class="form-option">
+                                <p class="form-option-title">选项:</p>
+                                <div class="attributes">
+                                    <div class="attribute-label">尺码:</div>
+                                    <div class="attribute-list">
+                                        <select id="size"></select>
+                                        <a id="size_chart" class="fancybox" href="/images/size-chart.jpg">尺码表</a>
+                                    </div>
+                                </div>
+                                <div class="attributes">
+                                    <div class="attribute-label">颜色:</div>
+                                    <div class="attribute-list">
+                                        <ul class="list-color" id="color"></ul>
+                                    </div>
+                                </div>
+                                <div class="attributes">
+                                    <div class="attribute-label">数量:</div>
+                                    <div class="attribute-list product-qty">
+                                        <div class="qty">
+                                            <input id="option-product-qty" value="1"/>
+                                        </div>
+                                        <div class="btn-plus">
+                                            <a href="#" class="btn-plus-up">
+                                                <i class="fa fa-caret-up"
+                                                   onclick="$('#option-product-qty').val(parseInt($('#option-product-qty').val())-1)"></i>
+                                            </a>
+                                            <a href="#" class="btn-plus-down">
+                                                <i class="fa fa-caret-down"
+                                                   onclick="$('#option-product-qty').val(parseInt($('#option-product-qty').val())+1)"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-action">
+                                <div class="button-group">
+                                    <a id="addTrolley" class="btn-add-cart" href="#">加入购物车</a>
+                                </div>
+                                <div class="button-group">
+                                    <a id="addCollect" class="wishlist" href="#"><i class="fa fa-heart-o"></i><br>收藏</a>
+                                    <a id="addComparisonTable" class="compare" href="#"><i class="fa fa-signal"></i><br>比较</a>
+                                </div>
+                            </div>
+                            <div class="form-share">
+                                <div class="sendtofriend-print">
+                                    <a href="javascript:print();"><i class="fa fa-print"></i> 打印</a>
+                                    <a href="#"><i class="fa fa-envelope-o fa-fw"></i>分享</a>
+                                </div>
+                                <div class="network-share">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="product-tab">
+                        <ul class="nav-tab">
+                            <li class="active">
+                                <a aria-expanded="false" data-toggle="tab" href="#product-detail">产品详情</a>
+                            </li>
+                            <li>
+                                <a aria-expanded="true" data-toggle="tab" href="#information">详细资料</a>
+                            </li>
+                            <li>
+                                <a data-toggle="tab" href="#reviews">商品评价</a>
+                            </li>
+                            <li>
+                                <a data-toggle="tab" href="#guarantees">售后保障</a>
+                            </li>
+                        </ul>
+                        <div class="tab-container">
+                            <div id="product-detail" class="tab-panel active"
+                                 th:utext="${product.productInformation}"></div>
+                            <div id="information" class="tab-panel">
+                                <table class="table table-bordered" id="feature"></table>
+                            </div>
+                            <div id="reviews" class="tab-panel">
+                                <div id="comment" class="product-comments-block-tab">
+                                    <!--//jQuery load 加载评论-->
+                                </div>
+                            </div>
+                            <div id="guarantees" class="tab-panel" th:utext="${product.productAfterSale}"></div>
+                        </div>
+                    </div>
+                    <!-- ./tab product -->
+                    <!-- box product -->
+                    <div class="page-product-box">
+                        <h3 class="heading">相关产品</h3>
+                        <div id="related">
+                            <!--//jQuery load 加载相关产品-->
+                        </div>
+                    </div>
+                    <div class="page-product-box">
+                        <h3 class="heading">你可能喜欢</h3>
+                        <div id="like">
+                            <!--//jQuery load 加载相关产品-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 页底 -->
+<footer id="footer" th:replace="fragment/footer::footer"></footer>
+<a href="#" class="scroll_top" title="回到顶部">回到顶部</a>
+<!--JS-->
+<div th:replace="/fragment/js::js"></div>
+<script type="text/javascript" th:inline="javascript">
+    /***
+     * 加载销售单元
+     * */
+    function loadSku(id, productId, colorId, sizeId) {
+        $.ajax({
+            url: "/sku/getSku",
+            data: $.param({"id": id, "productId": productId, "colorId": colorId, "sizeId": sizeId}),
+            type: "get",
+            dataType: "json",
+            success: function (responseData) {
+                if (responseData.status == "-1") {
+                    console.log("失败");
+                    console.log(responseData.data);
+                    return;
+                }
+                var sku = responseData.data;
+
+                //打星
+                $("#skuRankNumber").text(sku.skuRank);
+
+                $("#skuRankImg").empty();
+                //打完整的星
+                for (var i = 0; i < parseInt(sku.skuRank); i++) {
+                    $("#skuRankImg").append($("<i class='fa fa-star'></i>"));
+                }
+                //打半颗星
+                if (sku.skuRank % 1 != 0) {
+                    $("#skuRankImg").append($("<i class='fa fa-star-half-o'></i>"));
+                }
+
+                //价格
+                $("#price").text("￥" + sku.skuPrice);
+                $("#old-price").text("￥" + sku.skuMarketPrice);
+                //保留小数点后两位
+                $("#discount").text("-" + parseFloat(100 - (parseFloat(sku.skuPrice) / parseFloat(sku.skuMarketPrice)) * 100).toFixed(2) + "%");
+
+                //编号
+                $("span#code").text(sku.id);
+                //库存
+                $("span#repertory").text(sku.skuStock > 0 ? "有货(" + sku.skuStock + ")" : "无货");
+
+                //设置颜色S
+                //绑定颜色选择事件
+                console.log("设置颜色");
+                $("#color li").each(function (index, obj) {
+                    $(obj).removeClass("optColor");
+                    if ($(obj).attr("colorId") == sku.colorId) {
+                        $(obj).addClass("optColor");
+                    }
+                });
+
+                console.log("设置尺码");
+                //设置尺码
+                $("#size option").each(function (index, obj) {
+                    if ($(obj).val() == sku.sizeId) {
+                        $(obj).attr("selected", "selected");
+                    }
+                });
+
+                //设置加入购物车
+                $("#addTrolley").attr("href", "javascript:addTrolley('" + sku.id + "')");
+                //设置比较
+                $("#addComparisonTable").attr("href", "javascript:addComparisonTable('" + sku.id + "')");
+                //设置收藏
+                var id = /*[[${session.currentUser eq null ?'':session.currentUser.id}]]*/'';
+                $("#addCollect").attr("href", "javascript:addCollect('" + sku.id + "','" + id + "')");
+            },
+            error: function () {
+                console.log("失败");
+            }
+        });
+    }
+
+
+    $(function () {
+        //加载产品分类
+        $.ajax({
+            url: "/type/getTypesByType",
+            data: $.param({"typeParentId": "root"}),
+            type: "get",
+            dataType: "json",
+            success: function (responseData) {
+                if (responseData.status == "-1") {
+                    console.log("失败");
+                    console.log(responseData.data);
+                    return;
+                }
+                $("#classify").empty();
+                for (var i in  responseData.data) {
+                    var $span = $("<span></span>");
+                    var $a = $("<a href='/product/category?classifyChecked=" + responseData.data[i].id + "'></a>").text(responseData.data[i].typeName);
+                    var $li = $("<li></li>").attr("id", responseData.data[i].id).append($span).append($a);
+                    $("#classify").append($li);
+                }
+            },
+            error: function () {
+                console.log("失败");
+            }
+        });
+
+        //加载当前产品的所有属性
+        $.ajax({
+            url: "/feature/getFeatures",
+            data: $.param({"ids": /*[[${product.productFeatures}]]*/""}),
+            type: "get",
+            dataType: "json",
+            success: function (responseData) {
+                if (responseData.status == "-1") {
+                    console.log("失败");
+                    console.log(responseData.data);
+                    return;
+                }
+                var featureValues = new Array();
+                for (var index in responseData.data) {
+                    featureValues[index] = responseData.data[index].featureValue;
+                }
+
+                //添加详细资料
+                $td_name = $("<td width='200'>质地</td>");
+                $td_value = $("<td></td>").text(featureValues.join(","));
+                $tr = $("<tr></tr>").append($td_name).append($td_value);
+                $("#feature").append($tr);
+            },
+            error: function () {
+                console.log("失败");
+            }
+        });
+
+        //加载当前产品所有尺码
+        $.ajax({
+            url: "/size/getSizes",
+            data: $.param({"ids": /*[[${product.productSizes}]]*/""}),
+            type: "get",
+            dataType: "json",
+            success: function (responseData) {
+                if (responseData.status == "-1") {
+                    console.log("失败");
+                    console.log(responseData.data);
+                    return;
+                }
+
+                var productSizes = /*[[${product.productSizes}]]*/"";
+                var sizes = productSizes.split(",");
+
+                var sizeValues = new Array();
+                for (var index in responseData.data) {
+                    var isDisabled = false;
+                    for (var i in sizes) {
+                        if (sizes[i] == responseData.data[index].id) {
+                            isDisabled = true;
+                        }
+                    }
+                    $option = $(isDisabled ? "<option></option>" : "<option disabled='disabled'></option>").val(responseData.data[index].id).text(responseData.data[index].sizeName);
+                    $("#size").append($option);
+
+                    sizeValues[index] = responseData.data[index].sizeName;
+                }
+                //添加详细资料
+                $td_name = $("<td width='200'>尺码</td>");
+                $td_value = $("<td></td>").text(sizeValues.join(","));
+                $tr = $("<tr></tr>").append($td_name).append($td_value);
+                $("#feature").append($tr);
+            },
+            error: function () {
+                console.log("失败");
+            }
+        });
+
+        //加载当前产品所有颜色
+        $.ajax({
+            url: "/color/getColors",
+            data: $.param({"ids": /*[[${product.productColors}]]*/""}),
+            type: "get",
+            dataType: "json",
+            success: function (responseData) {
+                if (responseData.status == "-1") {
+                    console.log("失败");
+                    console.log(responseData.data);
+                    return;
+                }
+
+                var colorValues = new Array();
+                for (var index in responseData.data) {
+                    $a = $("<a href='#'></a>").text(responseData.data[index].colorName);
+                    $li = $("<li></li>").attr("colorId", responseData.data[index].id).css("background", "#" + responseData.data[index].colorImgUrl).append($a);
+                    $("#color").append($li);
+                    colorValues[index] = responseData.data[index].colorName;
+                }
+
+                //添加详细资料
+                $td_name = $("<td width='200'>颜色</td>");
+                $td_value = $("<td></td>").text(colorValues.join(","));
+                $tr = $("<tr></tr>").append($td_name).append($td_value);
+                $("#feature").append($tr);
+            },
+            error: function () {
+                console.log("失败");
+            }
+        });
+
+        //jQuery load 加载评论
+        $("#comment").load("/comment/getComments", $.param({"productId": /*[[${product.id}]]*/""}));
+
+        //推荐部分
+
+        //jQuery load 加载畅销产品
+        $("#hot").load("/recommend/hotProducts");
+
+        //jQuery load 加载店家推荐
+        $("#commend").load("/recommend/commendProducts");
+
+        //jQuery load 加载新品特惠
+        $("#new").load("/recommend/newProductsDetail");
+
+        //jQuery load 加载相关产品
+        $("#related").load("/recommend/relatedProducts", $.param({
+            "id": /*[[${product.id}]]*/"",
+            "brandId": /*[[${product.brandId}]]*/"",
+            "typeId": /*[[${product.typeId}]]*/""
+        }));
+
+        //jQuery load 加载你可能喜欢
+        $("#like").load("/recommend/likeProducts", $.param({
+            "id": /*[[${product.id}]]*/"",
+            "brandId": /*[[${product.brandId}]]*/"",
+            "typeId": /*[[${product.typeId}]]*/""
+        }));
+
+
+        var skuId = /*[[${skuId}]]*/null;//跳转当前页面的产品销售单元编号
+
+        //加载默认初始化的销售单元价格、评级等信息
+        loadSku(skuId);
+    });
+</script>
+<script type="text/javascript" th:inline="javascript">
+    $(function () {
+        $(document).on("click", "#color li", function () {
+            var sizeId = $("select#size").val();
+            var colorId = $(this).attr("colorId");
+            var productId = /*[[${product.id}]]*/null;
+            loadSku(null, productId, colorId, sizeId);
+        }).on("change", "select#size", function () {
+            //绑定尺码选择事件
+            var sizeId = $(this).val();
+            var colorId = $("#color li[class*='active']").attr("colorId");
+            var productId = /*[[${product.id}]]*/null;
+            loadSku(null, productId, colorId, sizeId);
+        });
+    });
+
+    //翻页
+    function loadComments(pageNum) {
+        $("#comment").load("/comment/getComments", $.param({"pageNum": pageNum, "productId": /*[[${product.id}]]*/""}));
+    }
+</script>
+</body>
+
+</html>

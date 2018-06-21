@@ -1,0 +1,29 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.springframework.org/schema/data/jaxb">
+
+<head>
+    <title>500</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="keywords" content="" />
+    <link rel='stylesheet' type='text/css' th:href="@{css/bootstrap.min.css}" />
+    <link rel='stylesheet' type='text/css' th:href="@{css/style.css}" />
+</head>
+
+<body>
+    <div class="error_page">
+        <div class="error-top error">
+            <h3>500</h3>
+            <p class="sorry">对不起，您的请求似乎有些问题，但好消息！不是我们，是你！</p>
+            <div class="error-btn">
+                <a class="read fourth" th:href="@{/index}" th:if="${#httpServletRequest.isUserInRole('CONNECTION')}" >返回我的主页</a>
+                <a class="read fourth" th:href="@{/login}" th:unless="${#httpServletRequest.isUserInRole('CONNECTION')}" >返回登入页面</a>
+            </div>
+        </div>
+    </div>
+    <div class="footer error">
+        <div th:replace="fragments/footer :: footer"></div>
+    </div>
+</body>
+
+</html>

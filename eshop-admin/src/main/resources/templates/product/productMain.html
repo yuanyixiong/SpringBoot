@@ -1,0 +1,88 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<div class="tables-main">
+    <ol class="breadcrumb">
+        <li><a th:href="@{/index}">首页</a></li>
+        <li><a href="#">商品模块</a></li>
+        <li class="active"><a href="javascript:loadHTML('/shopping/mall/product/main')">商品管理</a></li>
+        <li><a href="#" id="triggerInfo">桌面列表</a></li>
+    </ol>
+    <div class="chrt-inner grid-1">
+        <div class="form-body ">
+            <div data-example-id="simple-form-inline">
+                <form class="form-inline" th:action="@{/shopping/mall/brand/getPages}" method="get">
+                    <input type="hidden" class="form-control" name="page" value="0" id="page"/>
+                    <input id="is_del" type="hidden" class="form-control" name="isDel" th:value="2"/>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="id" placeholder="商品编号"/>
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="productName" placeholder="商品名称"/>
+                    </div>
+                    <button type="button" class="btn btn-success" sign="search">查询</button>
+                    <button type="button" class="btn btn-info" sign="new">添加</button>
+                    <button type="button" class="btn btn-warning" sign="trigger">回收站</button>
+                </form>
+            </div>
+        </div>
+        <!--//这里显示数据-->
+        <table class="table table-hover">
+            <thead>
+            <tr class="info">
+                <th>序号</th>
+                <th>商品名称</th>
+                <th>是否新品特惠</th>
+                <th>是否畅销</th>
+                <th>是否推荐</th>
+                <th>上架/下架</th>
+                <th>是否删除</th>
+                <th>销量</th>
+                <th>最近更新时间</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody id="data">
+            </tbody>
+        </table>
+        <!--//这里显示分页-->
+        <div id="pagination" class="pagination"></div>
+    </div>
+    <div class="clearfix"></div>
+</div>
+<!--模块独有特性 JS -->
+<script type="text/javascript" th:inline="javascript">
+    //商品模块main页面链接操作的url
+    var saveUrl = "/shopping/mall/product/from?action=add";//添加-跳转from页面URL,且指定多动类型为add
+    var editUrl = "/shopping/mall/product/from?action=edit";//编辑-跳转from页面URL,且指定多动类型为edit
+    var infoUrl = "/shopping/mall/product/from?action=info";//详情-跳转from页面URL,且指定多动类型为info
+    var getPagesUrl = "/shopping/mall/product/getPages";//模块分页的URL
+    var deleteUrlReal = "/shopping/mall/product/deleteReal";//分页列表真删除的URL
+    var deleteUrlFake = "/shopping/mall/product/deleteFake";//分页列表假删除的URL
+    var deleteUrlRestore = "/shopping/mall/product/deleteUrlRestore";//分页列表删除的还原URL
+
+    var productUpUrl = "/shopping/mall/product/productUpUrl";//商品上架的URL
+    var productDownUrl = "/shopping/mall/product/productDownUrl";//商品下架的URL
+
+    //控制分页列表的按钮
+    var buttons = new Buttons(true, true, true, false, false, true, true);
+
+    /**
+     * 初始化一行数据
+     * @param model 单个数据对象
+     * @param serialNumber 当前行的序号
+     * @returns {Array}
+     */
+    function initRowValues(model, serialNumber) {
+        var id = model.id;
+        var productName = model.productName;
+        var productIsNew = model.productIsNew == 1 ? "旧品" : "新品";
+        var productIsHot = model.productIsHot == 1 ? "不畅销" : "畅销";
+        var productIsCommend = model.productIsCommend == 1 ? "不推荐" : "推荐";
+        var productIsShow = model.productIsShow == 1 ? "已下架" : "已上架";
+        var isDel = model.isDel == 1 ? "已删" : "未删";
+        var productSales = model.productSales;
+        var updateTime = model.updateTime == null ? new Date().NULL : new Date(model.updateTime).format("yyyy-MM-dd hh:mm:ss");
+        return new Array(serialNumber, productName, productIsNew, productIsHot, productIsCommend, productIsShow, isDel, productSales, updateTime, id);
+    }
+</script>
+<!--模块分页通用JS-->
+<script type="text/javascript" th:inline="javascript" th:src="@{/js/index.js}"></script>

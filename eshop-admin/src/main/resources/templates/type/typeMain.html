@@ -1,0 +1,85 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<div class="tables-main">
+    <ol class="breadcrumb">
+        <li><a th:href="@{/index}">首页</a></li>
+        <li><a href="#">商品模块</a></li>
+        <li class="active"><a href="javascript:loadHTML('/shopping/mall/type/main')">商品类型管理</a></li>
+        <li><a href="#" id="triggerInfo">桌面列表</a></li>
+    </ol>
+    <div class="chrt-inner grid-1">
+        <div class="form-body ">
+            <div data-example-id="simple-form-inline">
+                <form class="form-inline" th:action="@{/shopping/mall/type/getPages}" method="get">
+                    <input type="hidden" class="form-control" name="page" value="0" id="page" />
+                    <input id="is_del" type="hidden" class="form-control" name="isDel" th:value="2" />
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="id" placeholder="类型编码" />
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="typeName" placeholder="类型名称" />
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="typeNote" placeholder="类型描述" />
+                    </div>
+                    <button type="button" class="btn btn-success" sign="search">查询</button>
+                    <button type="button" class="btn btn-info" sign="new">添加</button>
+                    <button type="button" class="btn btn-warning" sign="trigger">回收站</button>
+                </form>
+            </div>
+        </div>
+        <!--//这里显示数据-->
+        <table class="table table-hover">
+            <thead>
+            <tr class="info">
+                <th>序号</th>
+                <th>类型编码</th>
+                <th>类型父级编码</th>
+                <th>类型名称</th>
+                <th>是否移除</th>
+                <th>类型click链接地址</th>
+                <th>类型图片地址</th>
+                <th>最近更新时间</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody id="data">
+            </tbody>
+        </table>
+        <!--//这里显示分页-->
+        <div id="pagination" class="pagination"></div>
+    </div>
+    <div class="clearfix"></div>
+</div>
+<!--模块独有特性 JS -->
+<script type="text/javascript" th:inline="javascript">
+    //商品类型模块main页面链接操作的url
+    var saveUrl = "/shopping/mall/type/from?action=add";//添加-跳转from页面URL,且指定多动类型为add
+    var editUrl = "/shopping/mall/type/from?action=edit";//编辑-跳转from页面URL,且指定多动类型为edit
+    var infoUrl = "/shopping/mall/type/from?action=info";//详情-跳转from页面URL,且指定多动类型为info
+    var getPagesUrl = "/shopping/mall/type/getPages";//模块分页的URL
+    var deleteUrlReal = "/shopping/mall/type/deleteReal";//分页列表真删除的URL
+    var deleteUrlFake = "/shopping/mall/type/deleteFake";//分页列表假删除的URL
+    var deleteUrlRestore="/shopping/mall/type/deleteUrlRestore";//分页列表删除的还原URL
+
+    //控制分页列表的按钮
+    var buttons=new Buttons(true,true,true,false,false,false,false);
+
+    /**
+     * 初始化一行数据
+     * @param model 单个数据对象
+     * @param serialNumber 当前行的序号
+     * @returns {Array}
+     */
+    function initRowValues(model, serialNumber) {
+        var id = model.id;
+        var typeName = model.typeName;
+        var isDel = model.isDel==1?"已删":"未删";
+        var typeParentId = model.typeParentId;
+        var typeUrl = model.typeUrl;
+        var typeImage = model.typeImage;
+        var updateTime = model.updateTime == null ? new Date().NULL : new Date(model.updateTime).format("yyyy-MM-dd hh:mm:ss");
+        return new Array(serialNumber,id, typeName, typeParentId,isDel,typeUrl, typeImage, updateTime, id);
+    }
+</script>
+<!--模块分页通用JS-->
+<script type="text/javascript" th:inline="javascript" th:src="@{/js/index.js}"></script>

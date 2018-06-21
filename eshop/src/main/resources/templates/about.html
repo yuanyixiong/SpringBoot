@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<!--CSS-->
+<head th:include="/fragment/css::css('轻实训电子商务平台-关于我们')"></head>
+<body class="category-page">
+<!-- header头部 -->
+<header id="header" th:replace="fragment/header::header"></header>
+<div class="columns-container">
+    <div class="container" id="columns">
+        <div class="breadcrumb clearfix">
+            <a class="home" th:href="@{/}" title="Return to Home">首页</a>
+            <span class="navigation-pipe">&nbsp;</span>
+            <span class="navigation_page">关于我们</span>
+        </div>
+        <div class="row">
+            <div class="column col-xs-12 col-sm-3" id="left_column">
+                <div class="block left-module">
+                    <p class="title_block">关于轻实训</p>
+                    <div class="block_content">
+                        <div class="layered layered-category">
+                            <div class="layered-content">
+                                <ul class="tree-menu">
+                                    <li th:each="tempAbout:${list}"
+                                        th:classappend="${eshopAbout.id eq tempAbout.id?'active':''}">
+                                        <span></span>
+                                        <a th:href="@{/about/main(id=${tempAbout.id})}"
+                                           th:text="${tempAbout.aboutTitle}">企业简介</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="commend" class="block left-module">
+                    <!--//jQuery load 加载店家推荐-->
+                </div>
+            </div>
+            <div class="center_column col-xs-12 col-sm-9" id="center_column" th:utext="${eshopAbout.aboutContent}">
+                <h2 class="page-heading">
+                    <span class="page-heading-title2">关于我们</span>
+                </h2>
+                <div class="content-text clearfix">
+                    <p>明博科技注册于武汉东湖高新技术开发区，团队成员分布于武汉、北京、上海及南京。公司专注于互联网教育平台的开发运营及移动互联网应用的设计开发。</p>
+                    <p>公司团队以敏捷活跃的90后新人类为主力军，以经验丰富的70后为支撑，实现公司多层次、梯队化人才结构的融合成长。</p>
+                    <p>明博科技的企业客户将覆盖信息技术相关领域的企业及培训机构，同时我们还为其他行业的客户提供信息技术的相关服务及支持。</p>
+                    <p>明博科技的主要业务包括移动应用的设计及开发、基于beacon的软硬件的设计及开发、在线教育平台的设计、开发及运营。目前公司已经开发了轻实训平台、知名汽车企业的CRM系统。 </p>
+                    <p>高效为企业培养合适、合格、优质人才，建立企业后备人才梯队，降低企业人力资源总成本</p>
+                    <p>联合机构提供O2O培训服务，提高学习的知识留存率，降低学员学习总成本，为学员提供终生学习服务</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 页底 -->
+<footer id="footer" th:replace="fragment/footer::footer"></footer>
+<a href="#" class="scroll_top" title="回到顶部">回到顶部</a>
+<!--JS-->
+<div th:replace="/fragment/js::js"></div>
+<script type="text/javascript">
+    $(function () {
+        //jQuery load 加载店家推荐
+        $("#commend").load("/recommend/commendProducts");
+    });
+</script>
+</body>
+
+</html>

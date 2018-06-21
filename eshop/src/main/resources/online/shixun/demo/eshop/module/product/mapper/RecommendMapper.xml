@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="online.shixun.demo.eshop.module.product.mapper.RecommendMapper">
+
+    <!--//产品推荐的ResultMap-->
+    <resultMap id="recommendProductsResultMap" type="online.shixun.demo.eshop.dto.EshopProduct" extends="online.shixun.demo.eshop.module.product.mapper.EshopProductMapper.productBaseResultMap">
+        <!--//图片-->
+        <collection column="product_id" property="imgs" javaType="online.shixun.demo.eshop.dto.EshopImg" resultMap="online.shixun.demo.eshop.module.product.mapper.EshopImgMapper.imgBaseResultMap"/>
+        <!--//最小销售单元-->
+        <collection column="product_id" property="skus" javaType="online.shixun.demo.eshop.dto.EshopSku" resultMap="online.shixun.demo.eshop.module.product.mapper.EshopSkuMapper.skuBaseResultMap"/>
+    </resultMap>
+
+    <!--//[detail.html]畅销产品-->
+    <select id="hotProducts" resultMap="recommendProductsResultMap">
+        SELECT
+        <!--//最小销售单元-->
+        <include refid="online.shixun.demo.eshop.module.product.mapper.EshopSkuMapper.skuBaseJoinRenameSQL"/>,
+
+        <!--//产品-->
+        <include refid="online.shixun.demo.eshop.module.product.mapper.EshopProductMapper.productBaseJoinRenameSQL"/>,
+
+        <!--//图片-->
+        <include refid="online.shixun.demo.eshop.module.product.mapper.EshopImgMapper.imgBaseJoinRenameSQL"/>,
+
+        <!--//mysql 8.0.11 特有函数 dense_rank 实现高效的分组取出第一条数据,第一条销售单元获取标准 最新，售价最低，市场价最高的商品-->
+        dense_rank() over(ORDER BY sku.`update_time` DESC,sku.`sku_price` ASC,sku.`sku_market_price` DESC)
+        FROM `eshop_sku` sku
+        <!--//连表的数据筛选条件尽可能写在连接的 on关键字后，以此减少笛卡儿积的生成-->
+        <!--//检索基础逻辑要求，销售单元：未移除(is_del=2)，有库存(sku_stock>0)，商品：未移除(is_del=2)，已上架(product_is_show=2)并且是畅销产品(product_is_hot=2)-->
+        INNER JOIN `eshop_product` product ON product.`id`=sku.`product_id` AND sku.`is_del`=2 AND sku.`sku_stock`>0 AND product.`is_del`=2 AND product.`product_is_show`=2 AND product.`product_is_hot`=2
+        <!--//检索基础逻辑要求，图片：未移除(is_del=2)，是默认显示的主图片(img_is_def=2)-->
+        INNER JOIN `eshop_img` img ON img.`product_id`=product.`id` AND img.img_is_def=2 AND img.`is_del`=2
+        GROUP BY sku.`product_id` ORDER BY product.`update_time` DESC,sku.`update_time` DESC LIMIT 6
+    </select>
+
+    <!--//[detail.html]店家推荐-->
+    <select id="commendProducts" resultMap="recommendProductsResultMap">
+        SELECT
+        <!--//最小销售单元-->
+        <include refid="online.shixun.demo.eshop.module.product.mapper.EshopSkuMapper.skuBaseJoinRenameSQL"/>,
+
+        <!--//产品-->
+        <include refid="online.shixun.demo.eshop.module.product.mapper.EshopProductMapper.productBaseJoinRenameSQL"/>,
+
+        <!--//图片-->
+        <include refid="online.shixun.demo.eshop.module.product.mapper.EshopImgMapper.imgBaseJoinRenameSQL"/>,
+
+        <!--//mysql 8.0.11 特有函数 dense_rank 实现高效的分组取出第一条数据,第一条销售单元获取标准 最新，售价最低，市场价最高的商品-->
+        dense_rank() over(ORDER BY sku.`update_time` DESC,sku.`sku_price` ASC,sku.`sku_market_price` DESC)
+        FROM `eshop_sku` sku
+        <!--//连表的数据筛选条件尽可能写在连接的 on关键字后，以此减少笛卡儿积的生成-->
+        <!--//检索基础逻辑要求，销售单元：未移除(is_del=2)，有库存(sku_stock>0)，商品：未移除(is_del=2)，已上架(product_is_show=2)并且是推荐产品(product_is_commend=2)-->
+        INNER JOIN `eshop_product` product ON product.`id`=sku.`product_id` AND sku.`is_del`=2 AND sku.`sku_stock`>0 AND product.`is_del`=2 AND product.`product_is_show`=2 AND product.`product_is_commend`=2
+        <!--//检索基础逻辑要求，图片：未移除(is_del=2)，是默认显示的主图片(img_is_def=2)-->
+        INNER JOIN `eshop_img` img ON img.`product_id`=product.`id` AND img.img_is_def=2 AND img.`is_del`=2
+        GROUP BY sku.`product_id` ORDER BY product.`update_time` DESC,sku.`update_time` DESC LIMIT 3
+    </select>
+
+    <!--//[detail.html]最新上架[新品特惠]-->
+    <select id="newProducts" resultMap="recommendProductsResultMap">
+        SELECT
+        <!--//最小销售单元-->
+        <include refid="online.shixun.demo.eshop.module.product.mapper.EshopSkuMapper.skuBaseJoinRenameSQL"/>,
+
+        <!--//产品-->
+        <include refid="online.shixun.demo.eshop.module.product.mapper.EshopProductMapper.productBaseJoinRenameSQL"/>,
+
+        <!--//图片-->
+        <include refid="online.shixun.demo.eshop.module.product.mapper.EshopImgMapper.imgBaseJoinRenameSQL"/>,
+
+        <!--//mysql 8.0.11 特有函数 dense_rank 实现高效的分组取出第一条数据,第一条销售单元获取标准 最新，售价最低，市场价最高的商品-->
+        dense_rank() over(ORDER BY sku.`update_time` DESC,sku.`sku_price` ASC,sku.`sku_market_price` DESC)
+        FROM `eshop_sku` sku
+        <!--//连表的数据筛选条件尽可能写在连接的 on关键字后，以此减少笛卡儿积的生成-->
+        <!--//检索基础逻辑要求，销售单元：未移除(is_del=2)，有库存(sku_stock>0)，商品：未移除(is_del=2)，已上架(product_is_show=2)并且是特惠新品(product_is_new=2)-->
+        INNER JOIN `eshop_product` product ON product.`id`=sku.`product_id` AND sku.`is_del`=2 AND sku.`sku_stock`>0 AND product.`is_del`=2 AND product.`product_is_show`=2 AND product.`product_is_new`=2
+        <!--//检索基础逻辑要求，图片：未移除(is_del=2)，是默认显示的主图片(img_is_def=2)-->
+        INNER JOIN `eshop_img` img ON img.`product_id`=product.`id` AND img.img_is_def=2 AND img.`is_del`=2
+        GROUP BY sku.`product_id` ORDER BY product.`update_time` DESC,sku.`update_time` DESC LIMIT #{size}
+    </select>
+
+    <!--//[detail.html]相关产品-->
+    <select id="relatedProducts" resultMap="recommendProductsResultMap" parameterType="online.shixun.demo.eshop.dto.EshopProduct">
+        SELECT
+        <!--//最小销售单元-->
+        <include refid="online.shixun.demo.eshop.module.product.mapper.EshopSkuMapper.skuBaseJoinRenameSQL"/>,
+        <!--//产品-->
+        <include refid="online.shixun.demo.eshop.module.product.mapper.EshopProductMapper.productBaseJoinRenameSQL"/>,
+        <!--//图片-->
+        <include refid="online.shixun.demo.eshop.module.product.mapper.EshopImgMapper.imgBaseJoinRenameSQL"/>,
+
+        <!--//mysql 8.0.11 特有函数 dense_rank 实现高效的分组取出第一条数据,第一条销售单元获取标准 最新，售价最低，市场价最高的商品-->
+        dense_rank() over(ORDER BY sku.`update_time` DESC,sku.`sku_price` ASC,sku.`sku_market_price` DESC)
+        FROM `eshop_sku` sku
+        <!--//连表的数据筛选条件尽可能写在连接的 on关键字后，以此减少笛卡儿积的生成-->
+        <!--//检索基础逻辑要求，销售单元：未移除(is_del=2)，商品：未移除(is_del=2)，已上架(product_is_show=2)-->
+        INNER JOIN (
+        (
+        <!--//最新上架，品牌类型一致-->
+        SELECT
+        <include refid="online.shixun.demo.eshop.module.product.mapper.EshopProductMapper.productBaseUnJoinRenameSQL"/>
+        FROM `eshop_product` product
+        WHERE `brand_id` = #{brandId}
+        AND `type_id` = #{typeId}
+        AND `id` !=#{id}
+        AND `is_del`=2
+        ORDER BY update_time DESC LIMIT 2
+        )
+        UNION ALL
+        (
+        <!--//最新上架，品牌一致-->
+        SELECT
+        <include refid="online.shixun.demo.eshop.module.product.mapper.EshopProductMapper.productBaseUnJoinRenameSQL"/>
+        FROM `eshop_product` product
+        WHERE `brand_id` = #{brandId}
+        AND `type_id` != #{typeId}
+        AND `id` !=#{id}
+        AND `is_del`=2
+        ORDER BY update_time DESC LIMIT 2
+        )
+        UNION ALL
+        (
+        <!--//最新上架，类型一致-->
+        SELECT
+        <include refid="online.shixun.demo.eshop.module.product.mapper.EshopProductMapper.productBaseUnJoinRenameSQL"/>
+        FROM `eshop_product` product
+        WHERE `brand_id` != #{brandId}
+        AND `type_id` = #{typeId}
+        AND `id` !=#{id}
+        AND `is_del`=2
+        ORDER BY update_time DESC LIMIT 2
+        )
+        ) product ON product.`id`=sku.`product_id` AND sku.`sku_stock`>0
+        <!--//检索基础逻辑要求，图片：未移除(is_del=2)，是默认显示的主图片(img_is_def=2)-->
+        INNER JOIN `eshop_img` img ON img.`product_id`=product.`id` AND img.img_is_def=2 AND img.`is_del`=2
+        GROUP BY sku.`product_id` ORDER BY product.`update_time` DESC,sku.`update_time` DESC LIMIT 4
+    </select>
+
+    <!--//[detail.html]你可能喜欢-->
+    <select id="likeProducts" resultMap="recommendProductsResultMap" parameterType="online.shixun.demo.eshop.dto.EshopProduct">
+
+    </select>
+
+    <!--//[category.html]特价商品-->
+    <select id="bargainProducts" resultMap="recommendProductsResultMap" parameterType="online.shixun.demo.eshop.dto.EshopProduct">
+        SELECT
+        <!--//最小销售单元-->
+        <include refid="online.shixun.demo.eshop.module.product.mapper.EshopSkuMapper.skuBaseJoinRenameSQL"/>,
+        <!--//产品-->
+        <include refid="online.shixun.demo.eshop.module.product.mapper.EshopProductMapper.productBaseJoinRenameSQL"/>,
+        <!--//图片-->
+        <include refid="online.shixun.demo.eshop.module.product.mapper.EshopImgMapper.imgBaseJoinRenameSQL"/>,
+
+        <!--//mysql 8.0.11 特有函数 dense_rank 实现高效的分组取出第一条数据,第一条销售单元获取标准 最新，售价最低，市场价最高的商品-->
+        dense_rank() over(ORDER BY sku.`update_time` DESC,sku.`sku_price` ASC,sku.`sku_market_price` DESC)
+        FROM `eshop_sku` sku
+        <!--//检索基础逻辑要求，销售单元：未移除(is_del=2)，有库存(sku_stock>0，商品：未移除(is_del=2)，已上架(product_is_show=2)-->
+        INNER JOIN `eshop_product` product ON product.`id`=sku.`product_id` AND sku.`is_del`=2 AND sku.`sku_stock`>0 AND product.`is_del`=2 AND product.`product_is_show`=2
+        <!--//检索基础逻辑要求，图片：未移除(is_del=2)，是默认显示的主图片(img_is_def=2)-->
+        INNER JOIN `eshop_img` img ON img.`product_id`=product.`id` AND img.img_is_def=2 AND img.`is_del`=2
+        <!--//检索基础逻辑要求，销售单元：最便宜,评分最高的商品-->
+        GROUP BY sku.`product_id` ORDER BY sku.`sku_price`,sku.`sku_rank` DESC LIMIT 1
+    </select>
+
+</mapper>

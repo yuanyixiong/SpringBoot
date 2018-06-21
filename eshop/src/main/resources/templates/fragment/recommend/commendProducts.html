@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<!--//jQuery load 加载评论-->
+<!-- 商品明细页面(detail)推荐：店家推荐[店家推荐的商品]jquery load 加载的模板 -->
+<p class="title_block">店家推荐</p>
+<div class="block_content product-onsale">
+    <ul class="owl-carousel owl-style2" data-loop="true" data-nav="false" data-margin="0" data-autoplayTimeout="1000" data-autoplayHoverPause="true" data-items="1" data-autoplay="true">
+        <li th:each="product:${products}">
+            <a th:href="@{/product/detail(productId=${product.id},skuId=${product.skus[0].id})}"><img  th:src="${#image.getImage(product.imgs[0].imgUrl,0)}" src="/images/slide-left.jpg"></a>
+        </li>
+    </ul>
+</div>
+</body>
+<!--水平切换插件-->
+<script type="text/javascript" th:src="@{/js/theme-script.js}"></script>
+</html>

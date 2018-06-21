@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<!--CSS-->
+<head th:include="/fragment/css::css('轻实训电子商务平台-产品比较')"></head>
+<body class="category-page">
+<!-- 模态框 -->
+<div class="modal fade" id="messModal">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <!-- 模态框头部 -->
+            <div class="modal-header">
+                <h4 class="modal-title">提示</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <!-- 模态框主体 -->
+            <div class="modal-body">
+                <span id="mess"></span>
+            </div>
+            <!-- 模态框底部 -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- header头部 -->
+<header id="header" th:replace="fragment/header::header"></header>
+<div class="columns-container">
+    <div class="container" id="columns">
+        <div class="breadcrumb clearfix">
+            <a class="home" th:href="@{/}" title="Return to Home" >首页</a>
+            <span class="navigation-pipe">&nbsp;</span>
+            <span class="navigation_page">产品比较</span>
+        </div>
+        <h2 class="page-heading">
+            <span class="page-heading-title2">产品比较</span>
+        </h2>
+        <div class="page-content">
+            <table class="table table-bordered table-compare">
+                <tr>
+                    <td class="compare-label">产品图片</td>
+                    <th:block th:each="product:${products}" >
+                        <td th:each="sku:${product.skus}" th:name="${sku.id}">
+                            <a th:href="@{/product/detail(productId=${product.id},skuId=${sku.id})}">
+                                <img th:src="${#image.getImage(product.imgs[0].imgUrl,2)}" src="@{/images/p93.jpg}">
+                            </a>
+                        </td>
+                    </th:block>
+                </tr>
+                <tr>
+                    <td class="compare-label">产品名称</td>
+                    <th:block th:each="product:${products}" >
+                        <td th:each="sku:${product.skus}" th:name="${sku.id}">
+                            <a th:href="@{/product/detail(productId=${product.id},skuId=${sku.id})}" th:text="${product.productName}">针织衫</a>
+                        </td>
+                    </th:block>
+                </tr>
+                <tr>
+                    <td class="compare-label">评级</td>
+                    <th:block th:each="product:${products}" >
+                        <td th:each="sku:${product.skus}" th:name="${sku.id}">
+                            <div class="product-star">
+                                <i class="fa fa-star" th:if="${sku.skuRank%1 eq 0}" th:each="skuRank:${#numbers.sequence(1,sku.skuRank)}"></i>
+                                <i class="fa fa-star" th:unless="${sku.skuRank%1 eq 0}" th:each="skuRank:${#numbers.sequence(1, sku.skuRank)}"></i>
+                                <i class="fa" th:unless="${sku.skuRank%1 eq 0}" th:classappend="${sku.skuRank%1 eq 0?'fa-star':'fa-star-half-o'}"></i>
+                                <span>(3 评论)</span>
+                            </div>
+                        </td>
+                    </th:block>
+                </tr>
+                <tr>
+                    <td class="compare-label">价格</td>
+                    <th:block th:each="product:${products}" >
+                        <td class="price" th:each="sku:${product.skus}"  th:text="|￥${sku.skuPrice}|" th:name="${sku.id}">￥20</td>
+                    </th:block>
+                </tr>
+                <tr>
+                    <td class="compare-label">描述</td>
+                    <th:block th:each="product:${products}" >
+                        <td th:each="sku:${product.skus}" th:utext="${product.productDescription}" th:name="${sku.id}">
+                            本站商品信息均来自于合作方，其真实性、准确性和合法性由信息拥有者（合作方）负责。本站不提供任何保证，并不承担任何法律责任。印刷版次不同，印刷时间和版次以实物为准。
+                        </td>
+                    </th:block>
+                </tr>
+                <tr>
+                    <td class="compare-label">制造商</td>
+                    <th:block th:each="product:${products}" >
+                        <td th:each="sku:${product.skus}" th:text="${product.brand.brandName}" th:name="${sku.id}">CUCGU</td>
+                    </th:block>
+                </tr>
+                <tr>
+                    <td class="compare-label">库存</td>
+                    <th:block th:each="product:${products}" >
+                        <td class="instock" th:each="sku:${product.skus}"  th:text="${sku.skuStock}" th:name="${sku.id}">有现货 (20 件)</td>
+                    </th:block>
+                </tr>
+                <tr>
+                    <td class="compare-label">编码</td>
+                    <th:block th:each="product:${products}" >
+                        <td th:each="sku:${product.skus}" th:text="${sku.id}" th:name="${sku.id}">#873289</td>
+                    </th:block>
+                </tr>
+                <tr>
+                    <td class="compare-label">尺寸</td>
+                    <th:block th:each="product:${products}" >
+                        <td th:each="sku:${product.skus}"  th:text="${sku.size.sizeName}" th:name="${sku.id}">X</td>
+                    </th:block>
+                </tr>
+                <tr>
+                    <td class="compare-label">颜色</td>
+                    <th:block th:each="product:${products}" >
+                        <td th:each="sku:${product.skus}" th:text="${sku.color.colorName}" th:name="${sku.id}">粉色</td>
+                    </th:block>
+                </tr>
+                <tr>
+                    <td class="compare-label">重量</td>
+                    <th:block th:each="product:${products}" >
+                        <td th:each="sku:${product.skus}"  th:text="${product.productWeight}" th:name="${sku.id}">0.3kg</td>
+                    </th:block>
+                </tr>
+                <tr>
+                    <td class="compare-label">行动</td>
+                    <th:block th:each="product:${products}">
+                        <td class="action" th:each="sku:${product.skus}" th:name="${sku.id}" >
+                            <a class="add-cart button button-sm" title="加入购物车" th:href="|javascript:addTrolley('${sku.id}')|">加入购物车</a>
+                            <a class="button button-sm" th:href="|javascript:addCollect('${sku.id}','${session.currentUser eq null ?'':session.currentUser.id}')|"><i class="fa fa-heart-o"></i></a>
+                            <a class="button button-sm" th:href="|javascript:removeItem('${sku.id}')|"><i class="fa fa-close"></i></a>
+                        </td>
+                    </th:block>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+<!-- 页底 -->
+<footer id="footer" th:replace="fragment/footer::footer"></footer>
+<a href="#" class="scroll_top" title="回到顶部">回到顶部</a>
+<!--JS-->
+<div th:replace="/fragment/js::js"></div>
+<script type="text/javascript" th:inline="javascript">
+    $(function(){
+        var products=/*[[${products}]]*/null;
+        var number=0;
+        for(var i=0;i<products.length;i++){
+            number+=products[i].skus.length;
+        }
+        for(var i=number;i<4;i++) {
+            $("table tbody tr").append($('<td style="width: 20%;" ></td>'));
+        }
+    });
+
+    function removeItem(skuId) {
+        $.ajax({
+            url: "/comparison/removeItem",
+            data: $.param({"skuId": skuId}),
+            type: "get",
+            dataType: "json",
+            success: function (responseData) {
+                if (responseData.status == "-1") {
+                    console.log("失败");
+                    console.log(responseData.data);
+                    return;
+                }
+                $("td[name='" + skuId + "']").remove();
+                $("table tbody tr").append($('<td style="width: 20%;" ></td>'));
+            },
+            error: function () {
+                console.log("失败");
+            }
+        });
+    }
+</script>
+</body>
+
+</html>

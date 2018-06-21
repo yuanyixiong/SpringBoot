@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="online.shixun.demo.eshop.module.product.mapper.EshopImgMapper">
+
+    <!--//图片的ResultMap基础配置-->
+    <resultMap id="imgBaseResultMap" type="online.shixun.demo.eshop.dto.EshopImg">
+        <id column="img_id" property="id"></id>
+        <result column="img_is_del" property="isDel"></result>
+        <result column="img_create_time" property="createTime"></result>
+        <result column="img_update_time" property="updateTime"></result>
+        <result column="img_url" property="imgUrl"></result>
+        <result column="img_is_def" property="imgIsDef"></result>
+        <result column="img_name" property="imgName"></result>
+        <result column="img_product_id" property="productId"></result>
+    </resultMap>
+
+    <!--图片的基础列:连表改名SQL-->
+    <sql id="imgBaseJoinRenameSQL">
+        img.id as img_id, img.is_del as img_is_del,
+        img.create_time as img_create_time, img.update_time as img_update_time,
+        img.img_url, img.img_is_def, img.img_name, img.product_id as img_product_id
+    </sql>
+    <!--图片的基础列:单表未改名SQL-->
+    <sql id="imgBaseUnJoinRenameSQL">
+        img.id, img.is_del,
+        img.create_time, img.update_time,
+        img.img_url, img.img_is_def, img.img_name, img.product_id as img_product_id
+    </sql>
+
+</mapper>

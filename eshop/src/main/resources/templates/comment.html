@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<!--CSS-->
+<head th:include="/fragment/css::css('轻实训电子商务平台-评价')"></head>
+<body class="category-page">
+<!-- header头部 -->
+<header id="header" th:replace="fragment/header::header"></header>
+<div class="columns-container">
+    <div class="container" id="columns">
+        <div class="breadcrumb clearfix">
+            <a class="home" th:href="@{/}" title="Return to Home">首页</a>
+            <span class="navigation-pipe">&nbsp;</span>
+            <span class="navigation_page">商品评价</span>
+        </div>
+        <h2 class="page-heading no-line">
+            <span class="page-heading-title2" th:text="${product.productName}"></span>
+        </h2>
+        <div class="container">
+            <div class="col-sm-4">
+                <img th:src="${#image.getImage(product.imgs[0].imgUrl,0)}" class="center-block"/>
+            </div>
+            <div class="col-sm-8">
+                <form th:action="@{/comment/addComment}" method="post">
+                    <input type="hidden" name="productId" th:value="${product.id}"/>
+                    <input type="hidden" name="userId" th:value="${session.currentUser.id}"/>
+                    <div class="form-group">
+                        <label for="commonRank">商品打分</label>
+                        <input type="hidden" id="commonRank" name="commonRank" class="form-control" value="5"/>
+                        <br/>
+                        <th:block th:each="item,itemState:${#numbers.sequence(1,5)}">
+                            <button type="button" class="btn btn-info btn-sm" th:classappend="${itemState.last?'active':''}" th:text="|${item}分|" th:onclick="|rank('${item}',this)|"/>
+                        </th:block>
+                    </div>
+                    <div class="form-group">
+                        <label for="commonContent">评价内容</label>
+                        <textarea id="commonContent" name="commonContent" class="form-control" rows="5"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-default">提交</button>
+                </form>
+            </div>
+        </div>
+        <div class="container">
+            <!--根据用户评价的商品进行推荐-->
+        </div>
+    </div>
+</div>
+<!-- 页底 -->
+<footer id="footer" th:replace="fragment/footer::footer"></footer>
+<a href="#" class="scroll_top" title="回到顶部">回到顶部</a>
+<!--JS-->
+<div th:replace="/fragment/js::js"></div>
+<script type="text/javascript">
+    function rank(score,obj) {
+        $("button[type='button']").each(function (index, obj) {
+            $(obj).removeClass("active");
+        });
+        $(obj).addClass("active");
+        $("#commonRank").val(score);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="online.shixun.demo.eshop.module.product.mapper.EshopSizeMapper">
+
+    <!--//图片的ResultMap基础配置-->
+    <resultMap id="sizeBaseResultMap" type="online.shixun.demo.eshop.dto.EshopSize">
+        <id column="size_id" property="id"></id>
+        <result column="size_is_del" property="isDel"></result>
+        <result column="size_create_time" property="createTime"></result>
+        <result column="size_update_time" property="updateTime"></result>
+        <result column="size_name" property="sizeName"></result>
+        <result column="size_parent_id" property="sizeParentId"></result>
+        <result column="size_type" property="sizeType"></result>
+    </resultMap>
+
+    <!--颜色的基础列:连表改名SQL-->
+    <sql id="sizeBaseJoinRenameSQL">
+        size.`id` as size_id,
+        size.`is_del` as size_is_del,
+        size.`create_time`  as size_create_time,
+        size.`update_time` as size_update_time,
+        size.`size_name`,
+        size.`size_parent_id`,
+        size.`size_type`
+    </sql>
+    <!--颜色的基础列:单表未改名SQL-->
+    <sql id="sizeBaseUnJoinRenameSQL">
+        size.`id`,
+        size.`is_del`,
+        size.`create_time`,
+        size.`update_time`,
+        size.`size_name`,
+        size.`size_parent_id`,
+        size.`size_type`
+    </sql>
+
+</mapper>

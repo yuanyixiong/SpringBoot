@@ -1,0 +1,234 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="keywords" content=""/>
+    <!--Bootstrap Core CSS -->
+    <link rel='stylesheet' type='text/css' th:href="@{/plugins/bootstrap/bootstrap.min.css}"/>
+    <!--界面基础结构 CSS -->
+    <link rel='stylesheet' type='text/css' th:href="@{/css/style.css}"/>
+    <!--界面基础字体 CSS -->
+    <link rel='stylesheet' type='text/css' th:href="@{/css/font-awesome.css}"/>
+    <!--界面基础结构图标 CSS -->
+    <link rel="stylesheet" type='text/css' th:href="@{/css/icon-font.min.css}"/>
+    <!--jquery pagination分页插件的样式的CSS -->
+    <link rel="stylesheet" type='text/css' th:href="@{/plugins/jquery/pagination/pagination.css}"/>
+    <!--bootstrap jquery 下拉树插件的CSS -->
+    <link rel="stylesheet" type='text/css' th:href="@{/plugins/bootstrap/treeview/bootstrap-treeview.min.css}"/>
+    <!--bootstrap-multiselect实现下拉颜色的CSS-->
+    <link rel="stylesheet" type='text/css' th:href="@{/plugins/bootstrap/select/bootstrap-multiselect.css}"/>
+    <!--bootstrap-summernote富文本编辑器的CSS -->
+    <link rel="stylesheet" type='text/css' th:href="@{/plugins/bootstrap/summernote/summernote.css}"/>
+    <!--bootstrap-fileinput文件上传的CSS -->
+    <link rel="stylesheet" type='text/css'th:href="@{/plugins/bootstrap/fileinput/fileinput.min.css}" />
+    <!--bootstrap-table表格的CSS -->
+    <link rel="stylesheet" type='text/css'th:href="@{/plugins/bootstrap/table/bootstrap-table.min.css}" />
+</head>
+<body>
+<div class="page-container">
+    <div class="left-content">
+        <div class="inner-content">
+            <!--//头部复用-->
+            <div th:replace="fragments/header :: header"></div>
+            <!--//内容-->
+            <div class="outter-wp" id="content" style="padding-bottom: 100px;"></div>
+            <footer>
+                <!--//底部复用-->
+                <div th:replace="fragments/footer :: footer"></div>
+            </footer>
+        </div>
+    </div>
+    <div class="sidebar-menu">
+        <!--//logo-->
+        <header class="logo">
+            <a href="#" class="sidebar-icon">
+                <span class="fa fa-bars"></span>
+            </a>
+            <a th:href="@{/index}">
+                <span id="logo">
+                    <h1>电商后台</h1>
+                </span>
+            </a>
+        </header>
+        <!--//个人信息-->
+        <div class="down">
+            <a href="#">
+                <img th:src="@{${session.currentUser.userImage}}">
+            </a>
+            <a href="#">
+                <span class=" name-caret" th:text="${session.currentUser.userNicakName}"></span>
+            </a>
+            <p th:utext="${session.currentUser.userDescription}"></p>
+            <ul>
+                <li>
+                    <a class="tooltips" th:href="@{/admin}">
+                        <span>个人信息</span>
+                        <i  class="lnr">详情</i>
+                    </a>
+                </li>
+                <li>
+                    <a class="tooltips" th:href="@{/user}">
+                        <span>设置中心</span>
+                        <i class="lnr">设置</i>
+                    </a>
+                </li>
+                <li>
+                    <a class="tooltips" th:href="@{/logout}">
+                        <span>退出系统</span>
+                        <i class="lnr">登出</i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <!--//菜单 菜单可以多级，无限制-->
+        <div class="menu">
+            <ul id="menu">
+                <!--//一级菜单-->
+                <li id="menu-academico" th:each="node_one:${session.nodes}" >
+                    <a href="#" th:each="role:${session.currentUser.roles}"  th:if="${#sets.contains(role.resources,node_one.data)}">
+                        <i class="fa" th:classappend="${node_one.data.resourceIco}"></i>
+                        <span th:text="${node_one.data.resourceName}"></span>
+                        <span class="fa fa-angle-right" style="float: right"></span>
+                    </a>
+                    <!--//二级菜单-->
+                    <ul class="menu-academico-sub" >
+                        <li th:each="node_tow:${node_one.nodes}">
+                            <a th:each="role:${session.currentUser.roles}"  th:if="${#sets.contains(role.resources,node_tow.data)}" th:href="'javascript:loadHTML(\''+${node_tow.data.resourceUrl}+'\');'" >
+                                <i class="fa" th:classappend="${node_tow.data.resourceIco}"></i>
+                                <span  th:text="${node_tow.data.resourceName}"></span>
+                            </a>
+                            <!--//此处可扩展三级菜单-->
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<!--Jquery -->
+<script type="text/javascript" th:src="@{/plugins/jquery/jquery-1.10.2.min.js}"></script>
+<!--滚动条 -->
+<script type="text/javascript" th:src="@{/plugins/jquery/nicescroll/jquery.nicescroll.js}"></script>
+<!--网页基础架构JS -->
+<script type="text/javascript" th:src="@{/js/scripts.js}"></script>
+<!--Bootstrap Core JavaScript -->
+<script type="text/javascript" th:src="@{/plugins/bootstrap/bootstrap.min.js}"></script>
+<!--jquery pagination分页插件的样式的JS -->
+<script type="text/javascript" th:src="@{/plugins/jquery/pagination/jquery.pagination.js}"></script>
+<!--bootstrap jquery下拉树插件的JS -->
+<script type="text/javascript" th:src="@{/plugins/bootstrap/treeview/bootstrap-treeview.min.js}"></script>
+<!--bootstrap-multiselect实现下拉的JS-->
+<script type="text/javascript" th:src="@{/plugins/bootstrap/select/bootstrap-multiselect.js}"></script>
+<!--bootstrap-summernote富文本编辑器的JS -->
+<script type="text/javascript" th:src="@{/plugins/bootstrap/summernote/summernote.min.js}"></script>
+<script type="text/javascript" th:src="@{/plugins/bootstrap/summernote/lang/summernote-zh-CN.js}"></script><!--国际化语言包-->
+<!--bootstrap-fileinput文件上传的JS -->
+<script type="text/javascript" th:src="@{/plugins/bootstrap/fileinput/fileinput.min.js}"></script>
+<script type="text/javascript" th:src="@{/plugins/bootstrap/fileinput/locales/zh.js}"></script><!--国际化语言包-->
+<!--bootstrap-table表格JS -->
+<script type="text/javascript" th:src="@{/plugins/bootstrap/table/bootstrap-table.min.js}"></script>
+<script type="text/javascript" th:src="@{/plugins/bootstrap/table/locales/bootstrap-table-zh-CN.min.js}"></script><!--国际化语言包-->
+
+
+
+<!--日期格式化JS-->
+<script type="text/javascript" th:inline="javascript" th:src="@{/js/dateFormat.js}"></script>
+<!--自定义的Buttons对象js-->
+<script type="text/javascript" th:inline="javascript" th:src="@{/js/Buttons.js}"></script>
+<!--自定义的Map对象js-->
+<script type="text/javascript" th:inline="javascript" th:src="@{/js/Map.js}"></script>
+<!--头部导航栏JS-->
+<script type="text/javascript">
+    $(function(){
+        /**
+         * 导航栏右侧通知信息
+         **/
+        function DropDown(el) {
+            this.dd = el;
+            this.placeholder = this.dd.children('span');
+            this.opts = this.dd.find('ul.dropdown > li');
+            this.val = '';
+            this.index = -1;
+            this.initEvents();
+        }
+
+        DropDown.prototype = {
+            initEvents: function () {
+                var obj = this;
+
+                obj.dd.on('click', function (event) {
+                    $(this).toggleClass('active');
+                    return false;
+                });
+
+                obj.opts.on('click', function () {
+                    var opt = $(this);
+                    obj.val = opt.text();
+                    obj.index = opt.index();
+                    obj.placeholder.text(obj.val);
+                });
+            },
+            getValue: function () {
+                return this.val;
+            },
+            getIndex: function () {
+                return this.index;
+            }
+        }
+
+        $(function () {
+            var dd = new DropDown($('#dd'));
+            $(document).click(function () {
+                // all dropdowns
+                $('.wrapper-dropdown-3').removeClass('active');
+            });
+        });
+
+        /**
+         * 导航栏左侧全局查询框
+         */
+        $('.main-search').hide();
+        $('button').click(function () {
+            $('.main-search').show();
+            $('.main-search text').focus();
+        });
+        $('.close').click(function () {
+            $('.main-search').hide();
+        });
+    });
+</script>
+<!--侧边栏菜单/个人信息-->
+<script type="text/javascript">
+    $(function () {
+        //个人信息
+        var toggle = true;
+        $(".sidebar-icon").click(function () {
+            if (toggle) {
+                $(".page-container").addClass("sidebar-collapsed").removeClass("sidebar-collapsed-back");
+                $("#menu span").css({"position": "absolute"});
+            } else {
+                $(".page-container").removeClass("sidebar-collapsed").addClass("sidebar-collapsed-back");
+                setTimeout(function () {
+                    $("#menu span").css({"position": "relative"});
+                }, 400);
+            }
+            toggle = !toggle;
+        });
+    });
+
+    /***
+     * 开启页面
+     * @param url
+     */
+    function loadHTML(url){
+        $("#content").load(url);
+    }
+
+    //加载数据分析页面
+    loadHTML("/home");
+</script>
+</body>
+
+</html>

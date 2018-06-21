@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.com">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<!-- 自适应移动设备优先 -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- bootstrap 样式引用-->
+<link rel="stylesheet" type="text/css" th:href="@{/plugins/bootstrap/css/bootstrap.css}"/>
+<!-- 图标字体引用 -->
+<link rel="stylesheet" type="text/css" th:href="@{/plugins/font-awesome/css/font-awesome.css}"/>
+<!-- html select美化模拟类jquery插件样式，搜索框引用 -->
+<link rel="stylesheet" type="text/css" th:href="@{/plugins/select2/css/select2.css}"/>
+<!-- 响应式内容滑动插件样式 -->
+<link rel="stylesheet" type="text/css" th:href="@{/plugins/jquery.bxslider/jquery.bxslider.css}"/>
+<!-- 幻灯片插件样式 -->
+<link rel="stylesheet" type="text/css" th:href="@{/plugins/owl.carousel/owl.carousel.css}"/>
+<!-- jQuery UI 是一个建立在 jQuery JavaScript 库上的小部件和交互库，您可以使用它创建高度交互的 Web 应用程序 -->
+<link rel="stylesheet" type="text/css" th:href="@{/plugins/jquery-ui/jquery-ui.css}"/>
+<link rel="stylesheet" type="text/css" th:href="@{/plugins/fancyBox/jquery.fancybox.css}"/>
+<!-- 预设css3动画库样式 -->
+<link rel="stylesheet" type="text/css" th:href="@{/css/animate.css}"/>
+<!-- css重设 -->
+<link rel="stylesheet" type="text/css" th:href="@{/css/reset.css}"/>
+<!-- 自定义样式 -->
+<link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+<!-- 响应式布局样式 -->
+<link rel="stylesheet" type="text/css" th:href="@{/css/responsive.css}"/>
+<body>
+<!-- 翻页 -->
+<div class="col-sm-12">
+    <div class="bottom-pagination">
+        <nav>
+            <ul class="pagination">
+                <li th:unless="${pageInfo.isFirstPage}">
+                    <a th:href="|javascript:loadCollectItems('${pageInfo.firstPage}')|" aria-label="Next">
+                        <span aria-hidden="true">首页</span>
+                    </a>
+                </li>
+                <li th:if="${pageInfo.hasPreviousPage}">
+                    <a th:href="|javascript:loadCollectItems('${pageInfo.prePage}')|" aria-label="Next">
+                        <span aria-hidden="true">上一页 &laquo;</span>
+                    </a>
+                </li>
+                <li th:each="nav:${pageInfo.navigatepageNums}" th:classappend="${nav eq pageInfo.pageNum?'active':''}">
+                    <a th:href="|javascript:loadCollectItems('${nav}')|" th:text="${nav}">2</a></li>
+                <li th:if="${pageInfo.hasNextPage}">
+                    <a th:href="|javascript:loadCollectItems('${pageInfo.nextPage}')|" aria-label="Next">
+                        <span aria-hidden="true">下一页 &raquo;</span>
+                    </a>
+                </li>
+                <li th:unless="${pageInfo.isLastPage}">
+                    <a th:href="|javascript:loadCollectItems('${pageInfo.lastPage}')|" aria-label="Next">
+                        <span aria-hidden="true">末页</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+<ul class="row list-wishlist">
+    <li class="col-sm-3" th:each="item:${pageInfo.list}">
+        <div class="product-img">
+            <a th:href="@{/product/detail(productId=${item.product.id})}">
+                <img th:src="${#image.getImage(item.product.imgs[0].imgUrl,0)}">
+            </a>
+        </div>
+        <h5 class="product-name">
+            <a th:href="@{/product/detail(productId=${item.product.id})}" th:text="${item.product.productName}">collect椅子</a>
+        </h5>
+        <div class="qty">
+            <label>库存</label>
+            <input type="text" class="form-control input input-sm" th:value="${item.product.productSales}" readonly="readonly"/>
+        </div>
+        <div class="priority">
+            <label>尺寸</label>
+            <select th:id="${item.id}" class="form-control input input-sm">
+                <option th:each="size:${sizes}"
+                        th:value="${size.id}"
+                        th:text="${size.sizeName}"
+                        th:if="${#lists.contains(#strings.listSplit(item.product.productSizes,','),size.id)}"
+                        th:selected="${size.id eq item.sizeId}"
+                >均码
+                </option>
+            </select>
+        </div>
+        <div class="button-action">
+            <button class="button button-sm" th:onclick="|edit('${item.id}')|">保存</button>
+            <a th:href="|javascript:del('${item.id}','${item.collectId}')|"><i class="fa fa-close"></i></a>
+        </div>
+    </li>
+</ul>
+</body>
+<script type="text/javascript">
+    //单击删除-真删
+    function del(id, collectId) {
+        $.ajax({
+            url: "/collectItem/delete",
+            data: $.param({"id": id, "collectId": collectId}),
+            type: "get",
+            dataType: "json",
+            success: function (responseData) {
+                if (responseData.status == "-1") {
+                    console.log("失败");
+                    console.log(responseData.data);
+                    return;
+                }
+                $("#item").load("/collectItem/getCollectItems?collectId=" + collectId);
+            },
+            error: function () {
+                console.log("失败");
+            }
+        });
+    }
+
+    function edit(id) {
+        $.ajax({
+            url: "/collectItem/edit",
+            data: $.param({"id": id, "sizeId": $("#" + id).val()}),
+            type: "get",
+            dataType: "json",
+            success: function (responseData) {
+                if (responseData.status == "-1") {
+                    console.log("失败");
+                    console.log(responseData.data);
+                    return;
+                }
+            },
+            error: function () {
+                console.log("失败");
+            }
+        });
+    }
+
+    //翻页
+    function loadCollectItems(pageNum) {
+        var collectId = $("table tbody tr[class*='success'] td:eq(0)").text();
+        $("#item").load("/collectItem/getCollectItems?collectId=" + collectId + "&pageNum=" + pageNum);
+    }
+</script>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<!-- 商品列表页面(category)商品列表 jquery load 加载的模板 -->
+<div id="view-product-list" class="view-product-list">
+    <h2 class="page-heading">
+        <span class="page-heading-title" id="pageTitle"></span>
+    </h2>
+    <ul class="display-product-option">
+        <li class="view-as-grid selected">
+            <span>分组</span>
+        </li>
+        <li class="view-as-list">
+            <span>列表</span>
+        </li>
+    </ul>
+    <!-- 商品列表 -->
+    <ul class="row product-list grid">
+        <li th:each="product:${pageInfo.list}" class="col-sx-12 col-sm-4">
+            <div class="product-container">
+                <div class="left-block">
+                    <a th:href="@{/product/detail(productId=${product.id},skuId=${product.skus[0].id})}" >
+                        <img class="img-responsive"  th:src="${#image.getImage(product.imgs[0].imgUrl,0)}" />
+                    </a>
+                    <div class="quick-view">
+                        <a title="收藏" class="heart" th:href="|javascript:addCollect('${product.skus[0].id}','${session.currentUser eq null ?'':session.currentUser.id}')|"></a>
+                        <a title="比较" class="compare"  th:href="|javascript:addComparisonTable('${product.skus[0].id}')|"></a>
+                        <a title="查看" class="search"  th:href="@{/product/detail(productId=${product.id},skuId=${product.skus[0].id})}"></a>
+                    </div>
+                    <div class="add-to-cart">
+                        <a title="加入购物车" th:href="|javascript:addTrolley('${product.skus[0].id}')|">加入购物车</a>
+                    </div>
+                </div>
+                <div class="right-block">
+                    <h5 class="product-name"><a th:href="@{/product/detail(productId=${product.id},skuId=${product.skus[0].id})}" th:text="${product.productName}">披风外套</a></h5>
+                    <div class="product-star">
+                        <i class="fa fa-star" th:if="${product.skus[0].skuRank%1 eq 0}"  th:each="skuRank:${#numbers.sequence(1, product.skus[0].skuRank)}"></i>
+                        <i class="fa fa-star" th:unless="${product.skus[0].skuRank%1 eq 0}"  th:each="skuRank:${#numbers.sequence(1, product.skus[0].skuRank)}"></i>
+                        <i class="fa" th:unless="${product.skus[0].skuRank%1 eq 0}"  th:classappend="${product.skus[0].skuRank%1 eq 0?'fa-star':'fa-star-half-o'}" ></i>
+                    </div>
+                    <div class="content_price">
+                        <span class="price product-price" th:text="|￥${product.skus[0].skuPrice}|">￥38,95</span>
+                        <span class="price old-price" th:text="|￥${product.skus[0].skuMarketPrice}|">￥52,00</span>
+                    </div>
+                    <div class="info-orther">
+                        <p th:text="|编码: #${product.skus[0].id}|">编码: #453217907</p>
+                        <p class="availability">库存: <span th:text="${product.skus[0].skuStock gt 0 ?'有货':'无货'}">存货</span></p>
+                        <div class="product-desc" th:utext="${product.productDescription}">
+                            注：因厂家会在没有任何提前通知的情况下更改产品包装、产地或者一些附件，本司不能确保客户收到的货物与商城图片、产地、附件说明完全一致。只能确保为原厂正货！并且保证与当时市场上同样主流新品一致。若本商城没有及时更新，请大家谅解！
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>
+<!-- 翻页 -->
+<div class="sortPagiBar">
+    <div class="bottom-pagination">
+        <nav>
+            <ul class="pagination">
+                <li th:unless="${pageInfo.isFirstPage}">
+                    <a th:href="|javascript:loadProducts('${pageInfo.firstPage}')|" aria-label="Next">
+                        <span aria-hidden="true">首页</span>
+                    </a>
+                </li>
+                <li th:if="${pageInfo.hasPreviousPage}">
+                    <a th:href="|javascript:loadProducts('${pageInfo.prePage}')|"  aria-label="Next">
+                        <span aria-hidden="true">上一页 &laquo;</span>
+                    </a>
+                </li>
+                <li th:each="nav:${pageInfo.navigatepageNums}" th:classappend="${nav eq pageInfo.pageNum?'active':''}"><a th:href="|javascript:loadProducts('${nav}')|"  th:text="${nav}">2</a></li>
+                <li th:if="${pageInfo.hasNextPage}">
+                    <a th:href="|javascript:loadProducts('${pageInfo.nextPage}')|"  aria-label="Next">
+                        <span aria-hidden="true">下一页 &raquo;</span>
+                    </a>
+                </li>
+                <li th:unless="${pageInfo.isLastPage}">
+                    <a th:href="|javascript:loadProducts('${pageInfo.lastPage}')|" aria-label="Next">
+                        <span aria-hidden="true">末页</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+</body>
+<!-- 自定义js文件 -->
+<script type="text/javascript" th:src="@{/js/main.js}"></script>
+</html>

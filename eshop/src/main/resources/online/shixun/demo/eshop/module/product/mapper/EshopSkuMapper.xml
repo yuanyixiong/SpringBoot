@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="online.shixun.demo.eshop.module.product.mapper.EshopSkuMapper">
+
+    <!--//最小销售单元的ResultMap基础配置-->
+    <resultMap id="skuBaseResultMap" type="online.shixun.demo.eshop.dto.EshopSku">
+        <!--//需要修改别名的-->
+        <id column="sku_id" property="id"></id>
+        <result column="sku_is_del" property="isDel"></result>
+        <result column="sku_create_time" property="createTime"></result>
+        <result column="sku_update_time" property="updateTime"></result>
+        <result column="sku_product_id" property="productId"></result>
+        <result column="color_id" property="colorId"></result>
+        <result column="size_id" property="sizeId"></result>
+        <result column="create_user_id" property="createUserId"></result>
+        <result column="update_user_id" property="updateUserId"></result>
+        <!--//无需修改别名的-->
+        <result column="sku_delive_fee" property="skuDeliveFee"></result>
+        <result column="sku_price" property="skuPrice"></result>
+        <result column="sku_stock" property="skuStock"></result>
+        <result column="sku_market_price" property="skuMarketPrice"></result>
+        <result column="sku_upper_limit" property="skuUpperLimit"></result>
+        <result column="sku_location" property="skuLocation"></result>
+        <result column="sku_img" property="skuImg"></result>
+        <result column="sku_index" property="skuIndex"></result>
+        <result column="sku_name" property="skuName"></result>
+        <result column="sku_status" property="skuStatus"></result>
+        <result column="sku_type" property="skuType"></result>
+        <result column="sku_rank" property="skuRank"></result>
+    </resultMap>
+
+    <!--最小销售单元的基础列:连表改名SQL-->
+    <sql id="skuBaseJoinRenameSQL">
+        sku.id as sku_id, sku.is_del as sku_is_del,
+        sku.create_time as sku_create_time, sku.update_time as sku_update_time,
+        sku.product_id as sku_product_id, sku.color_id,
+        sku.size_id, sku.sku_delive_fee,
+        sku.sku_price, sku.sku_stock,
+        sku.sku_market_price,
+        sku.sku_sales, sku.sku_upper_limit,
+        sku.sku_location, sku.sku_img,
+        sku.sku_index, sku.sku_name,
+        sku.create_user_id, sku.update_user_id,
+        sku.sku_status, sku.sku_type,sku.sku_rank
+    </sql>
+    <!--最小销售单元的基础列:单表未改名SQL-->
+    <sql id="skuBaseUnJoinRenameSQL">
+        sku.id, sku.is_del,
+        sku.create_time, sku.update_time,
+        sku.product_id, sku.color_id,
+        sku.size_id, sku.sku_delive_fee,
+        sku.sku_price, sku.sku_stock,
+        sku.sku_market_price,
+        sku.sku_sales, sku.sku_upper_limit,
+        sku.sku_location, sku.sku_img,
+        sku.sku_index, sku.sku_name,
+        sku.create_user_id, sku.update_user_id,
+        sku.sku_status, sku.sku_type,sku.sku_rank
+    </sql>
+
+</mapper>

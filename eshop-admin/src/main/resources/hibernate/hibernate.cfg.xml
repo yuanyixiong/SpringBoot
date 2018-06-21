@@ -1,0 +1,27 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <property name="connection.url"><![CDATA[jdbc:mysql://localhost:3306/eshop?characterEncoding=UTF-8&serverTimezone=Hongkong]]></property>
+        <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
+        <mapping class="online.shixun.demo.eshopadmin.model.EshopAddrModel"/>
+        <mapping class="online.shixun.demo.eshopadmin.model.EshopBrandModel"/>
+        <mapping class="online.shixun.demo.eshopadmin.model.EshopColorModel"/>
+        <mapping class="online.shixun.demo.eshopadmin.model.EshopCommentModel"/>
+        <mapping class="online.shixun.demo.eshopadmin.model.EshopContactModel"/>
+        <mapping class="online.shixun.demo.eshopadmin.model.EshopDetailModel"/>
+        <mapping class="online.shixun.demo.eshopadmin.model.EshopDetailedListModel"/>
+        <mapping class="online.shixun.demo.eshopadmin.model.EshopFeatureModel"/>
+        <mapping class="online.shixun.demo.eshopadmin.model.EshopImgModel"/>
+        <mapping class="online.shixun.demo.eshopadmin.model.EshopOrderModel"/>
+        <mapping class="online.shixun.demo.eshopadmin.model.EshopProductModel"/>
+        <mapping class="online.shixun.demo.eshopadmin.model.EshopResourceModel"/>
+        <mapping class="online.shixun.demo.eshopadmin.model.EshopRoleModel"/>
+        <mapping class="online.shixun.demo.eshopadmin.model.EshopSizeModel"/>
+        <mapping class="online.shixun.demo.eshopadmin.model.EshopSkuModel"/>
+        <mapping class="online.shixun.demo.eshopadmin.model.EshopTypeModel"/>
+        <mapping class="online.shixun.demo.eshopadmin.model.EshopUserModel"/>
+    </session-factory>
+</hibernate-configuration>

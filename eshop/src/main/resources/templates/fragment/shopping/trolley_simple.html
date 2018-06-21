@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.com">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<!-- 模态框 -->
+<div class="modal fade" id="messModal">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <!-- 模态框头部 -->
+            <div class="modal-header">
+                <h4 class="modal-title">提示</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <!-- 模态框主体 -->
+            <div class="modal-body">
+                <span id="mess"></span>
+            </div>
+            <!-- 模态框底部 -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- header头部购物车下拉框 thymeleaf 模板-->
+<a title="购物车" th:href="@{/trolley/toList}">购物车</a>
+<span class="notify notify-right" th:text="${buyerCart.productAmount}">2</span>
+<div class="cart-block">
+    <div class="cart-block-content">
+        <h5 class="cart-title" th:text="|购物车${buyerCart.productAmount}件|">购物车2件</h5>
+        <div class="cart-block-list">
+            <ul>
+                <li class="product-info" th:each="item:${buyerCart.items}" th:classappend="${item.sku.skuStock lt item.amount ?'alert-danger':''}">
+                    <div class="p-left">
+                        <a th:href="@{/product/detail(productId=${item.productId},skuId=${item.sku.id})}">
+                            <img class="img-responsive" th:src="${#image.getImage(item.sku.skuImg)}"/>
+                        </a>
+                    </div>
+                    <div class="p-right">
+                        <p class="p-name" th:text="${item.sku.skuName}">女士衬衣</p>
+                        <p class="p-rice" th:text="|￥${item.sku.skuPrice}|">￥61.99</p>
+                        <p th:text="|数量:${item.amount}|">数量: 1</p>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+        <div class="toal-cart">
+            <span>总计</span>
+            <span class="toal-price pull-right" th:text="|￥${buyerCart.totalPrice}|">￥141.98</span>
+        </div>
+        <div class="cart-buttons">
+            <a  onclick="return toOrder()" th:href="@{/pay/main(id=${session.currentUser ne null?session.currentUser.id:''})}"
+               class="btn-check-out">结账</a>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" th:inline="javascript">
+    function toOrder() {
+        if (!/*[[${buyerCart.productAmount}]]*/0) {
+            $('#mess').text("当前购物车没有商品，无需结账");
+            $('#messModal').modal('show');
+            return false
+        }
+        if($("ul li[class*='alert-danger']").length>0){
+            $('#mess').text("当前购物车,存在库存不足情况,无法下订单");
+            $('#messModal').modal('show');
+            return false
+        }
+        return true
+    }
+</script>
+</body>
+</html>

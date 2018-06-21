@@ -1,0 +1,163 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+
+<div class="tables-main">
+    <ol class="breadcrumb">
+        <li><a th:href="@{/index}">首页</a></li>
+        <li class="active"><a href="javascript:loadHTML('/#')">数据分析</a></li>
+    </ol>
+    <!--//当天信息通知-->
+    <div class="custom-widgets">
+        <div class="row-one">
+
+            <!--//当天访客-->
+            <div class="col-md-3 widget">
+                <div class="stats-left ">
+                    <h5>今天</h5>
+                    <h4>访客</h4>
+                </div>
+                <div class="stats-right">
+                    <label>90</label>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+
+            <!--//当天上架商品-->
+            <div class="col-md-3 widget states-mdl">
+                <div class="stats-left">
+                    <h5>今天</h5>
+                    <h4>上架商品</h4>
+                </div>
+                <div class="stats-right">
+                    <label> 85</label>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+
+            <!--//当天下架商品-->
+            <div class="col-md-3 widget states-thrd">
+                <div class="stats-left">
+                    <h5>今天</h5>
+                    <h4>下架商品</h4>
+                </div>
+                <div class="stats-right">
+                    <label>51</label>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+
+            <!--//当天销售量-->
+            <div class="col-md-3 widget states-last">
+                <div class="stats-left">
+                    <h5>今天</h5>
+                    <h4>销售量</h4>
+                </div>
+                <div class="stats-right">
+                    <label>30</label>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+
+            <div class="clearfix"></div>
+        </div>
+    </div>
+
+    <!--//图表数据分析[销售]-->
+    <div class="charts">
+        <!--//商品销售详情-->
+        <div class="candile-inner">
+            <h3 class="sub-tittle">商品销售详情</h3>
+            <div id="center">
+                <div>
+                    此处后期使用D3.js做[商品销售]数据分析图表
+                </div>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+    <!--//图表数据分析[收藏/订单]-->
+    <div class="charts">
+        <div class="chrt-inner">
+            <div class="chrt-bars">
+                <!--//商品收藏详情-->
+                <div class="col-md-6 chrt-two">
+                    <h3 class="sub-tittle">商品收藏详情</h3>
+                    <div>
+                        此处后期使用D3.js做[商品收藏]数据分析图表
+                    </div>
+                </div>
+                <!--//商品订单详情-->
+                <div class="col-md-6 chrt-three">
+                    <h3 class="sub-tittle">商品订单详情</h3>
+                    <div>
+                        此处后期使用D3.js做[商品订单]数据分析图表
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+    </div>
+
+    <!--//待定-->
+    <div class="bottom-grids">
+        <div class="dev-table">
+
+            <!--//待定：快速进入模块-->
+            <div class="col-md-4 dev-col">
+                <div class="dev-widget dev-widget-transparent">
+                    <h2 class="inner one">收藏</h2>
+                    <p>描述...</p>
+                    <div class="dev-stat"><span class="counter">68</span>%</div>
+                    <div class="progress progress-bar-xs">
+                        <div class="progress-bar progress-bar-info" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 50%;"></div>
+                    </div>
+                    <p>详情...</p>
+                    <a href="#" class="dev-drop">
+                        快速链接...
+                        <span class="fa fa-angle-right pull-right"></span>
+                    </a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+
+            <!--//待定：快速进入模块-->
+            <div class="col-md-4 dev-col mid">
+                <div class="dev-widget dev-widget-transparent">
+                    <h2 class="inner one">订单</h2>
+                    <p>描述...</p>
+                    <div class="dev-stat"><span class="counter">68</span>%</div>
+                    <div class="progress progress-bar-xs">
+                        <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 50%;"></div>
+                    </div>
+                    <p>详情...</p>
+                    <a href="#" class="dev-drop">
+                        快速链接...
+                        <span class="fa fa-angle-right pull-right"></span>
+                    </a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+
+            <!--//待定：快速进入模块-->
+            <div class="col-md-4 dev-col">
+                <div class="dev-widget dev-widget-transparent">
+                    <h2 class="inner one">物流</h2>
+                    <p>描述...</p>
+                    <div class="dev-stat"><span class="counter">68</span>%</div>
+                    <div class="progress progress-bar-xs">
+                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 50%;"></div>
+                    </div>
+                    <p>详情...</p>
+                    <a href="#" class="dev-drop">
+                        快速链接...
+                        <span class="fa fa-angle-right pull-right"></span>
+                    </a>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+
+            <div class="clearfix"></div>
+        </div>
+    </div>
+
+</div>

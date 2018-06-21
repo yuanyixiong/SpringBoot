@@ -1,0 +1,35 @@
+server:
+  port: 8888
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://localhost:3306/eshop?characterEncoding=UTF-8&serverTimezone=Hongkong
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: root
+  jpa:
+    database: mysql
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+    database-platform: org.hibernate.dialect.MySQL5Dialect
+    open-in-view: true
+  thymeleaf:
+    cache: false
+
+logging:
+  pattern:
+    #console: "%d - %msg%n"
+  level:
+    online.shixun.demo.eshopadmin: debug
+
+system:
+  page:
+    size: 10
+  file:
+    images:
+      service:
+        nginxManagerURL: http://127.0.0.1:9000/ #文件维护地址(上传，删除)
+        nginxVisitURL: http://127.0.0.1:9001/ #文件访问地址
+      suffix:
+        include: .jpg|.jpeg|.png|.gif|.bmp

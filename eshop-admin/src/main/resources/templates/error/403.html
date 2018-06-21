@@ -1,0 +1,32 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.springframework.org/schema/data/jaxb">
+
+<head>
+    <title>404</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="keywords" content="" />
+    <link rel='stylesheet' type='text/css' th:href="@{css/bootstrap.min.css}" />
+    <link rel='stylesheet' type='text/css' th:href="@{css/style.css}" />
+    <link rel='stylesheet' type='text/css' th:href="@{css/font-awesome.css}" />
+</head>
+
+<body>
+    <div class="error_page error">
+        <div class="error-top error">
+            <h3>4<i class="fa fa-smile-o"></i>3</h3>
+            <span>Hello [[${#httpServletRequest.remoteUser}]]！</span>
+            <p th:if="${#httpServletRequest.isUserInRole('CONNECTION')}">您没有访问此页面的权限，请联系管理员.</p>
+            <p th:unless="${#httpServletRequest.isUserInRole('CONNECTION')}">您没有登入权限，请联系管理员.</p>
+            <div class="error-btn" >
+                <a class="read fourth" th:href="@{/index}" th:if="${#httpServletRequest.isUserInRole('CONNECTION')}" >返回我的主页</a>
+                <a class="read fourth" th:href="@{/login}" th:unless="${#httpServletRequest.isUserInRole('CONNECTION')}" >返回登入页面</a>
+            </div>
+        </div>
+    </div>
+    <div class="footer error">
+        <div th:replace="fragments/footer :: footer"></div>
+    </div>
+</body>
+
+</html>

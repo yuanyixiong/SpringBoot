@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.com">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<!-- 翻页 -->
+<div class="col-sm-12">
+    <div class="bottom-pagination">
+        <nav>
+            <ul class="pagination">
+                <li th:unless="${pageInfo.isFirstPage}">
+                    <a th:href="|javascript:loadOrderItems('${pageInfo.firstPage}')|" aria-label="Next">
+                        <span aria-hidden="true">首页</span>
+                    </a>
+                </li>
+                <li th:if="${pageInfo.hasPreviousPage}">
+                    <a th:href="|javascript:loadOrderItems('${pageInfo.prePage}')|" aria-label="Next">
+                        <span aria-hidden="true">上一页 &laquo;</span>
+                    </a>
+                </li>
+                <li th:each="nav:${pageInfo.navigatepageNums}" th:classappend="${nav eq pageInfo.pageNum?'active':''}">
+                    <a th:href="|javascript:loadOrderItems('${nav}')|" th:text="${nav}">2</a></li>
+                <li th:if="${pageInfo.hasNextPage}">
+                    <a th:href="|javascript:loadOrderItems('${pageInfo.nextPage}')|" aria-label="Next">
+                        <span aria-hidden="true">下一页 &raquo;</span>
+                    </a>
+                </li>
+                <li th:unless="${pageInfo.isLastPage}">
+                    <a th:href="|javascript:loadOrderItems('${pageInfo.lastPage}')|" aria-label="Next">
+                        <span aria-hidden="true">末页</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+<ul class="row list-wishlist">
+    <li class="col-sm-3" th:each="item:${pageInfo.list}">
+        <div class="product-img">
+            <a th:href="@{/product/detail(productId=${item.productId})}"><img th:src="${#image.getImage(item.orderItemUrl)}"></a>
+        </div>
+        <h5 class="product-name">
+            <label>名称：</label>
+            <a th:href="@{/product/detail(productId=${item.productId})}" th:text="${item.orderItemName}">椅子</a>
+        </h5>
+        <div class="priority">
+            <label>颜色：</label>
+            <span th:each="color:${colors}" th:if="${item.colorId eq color.id}"  th:text="${color.colorName}"></span>
+        </div>
+        <div class="priority">
+            <label>尺寸：</label>
+            <span th:each="size:${sizes}" th:if="${item.sizeId eq size.id}"  th:text="${size.sizeName}"></span>
+        </div>
+        <div class="priority">
+            <label>数量：</label>
+            <span th:text="${item.orderItemAmount}"></span>
+        </div>
+        <div class="priority">
+            <label>单价：</label>
+            <span th:text="|￥${item.orderItemProice}|"></span>
+        </div>
+        <div class="priority" th:if="${order.orderIsPaiy eq 3 and order.orderState eq 5}">
+            <a class="text-primary" th:href="@{/comment/main(productId=${item.productId})}">评价</a>
+        </div>
+    </li>
+</ul>
+<script type="text/javascript">
+    //翻页
+    function loadOrderItems(pageNum) {
+        var orderId = $("table tbody tr[class*='success'] td:eq(0) span:eq(1)").attr("value");
+        $("#item").load("/orderItem/getOrderItems?orderId=" + orderId + "&pageNum=" + pageNum);
+    }
+</script>
+</body>
+</html>

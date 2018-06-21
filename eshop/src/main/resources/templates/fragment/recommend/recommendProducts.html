@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script type="text/javascript" th:inline="javascript">
+    var size = /*[[${size}]]*/3;
+    $("ul").attr("data-responsive", '{"0":{"items":1},"600":{"items":3},"1000":{"items":' + size + '}}');
+</script>
+<!--//jQuery load 加载的模板-->
+<!--detail:你可能喜欢-->
+<!--detail:相关产品-->
+<!--index:最新特惠-->
+<ul class="product-list owl-carousel" data-dots="false" data-loop="true" data-nav="true" data-margin="30" data-autoplayTimeout="1000" data-autoplayHoverPause="true">
+    <li th:each="product:${products}">
+        <div class="product-container">
+            <div class="left-block">
+                <a th:href="@{/product/detail(productId=${product.id},skuId=${product.skus[0].id})}" >
+                    <img class="img-responsive" th:src="${#image.getImage(product.imgs[0].imgUrl,0)}"/>
+                </a>
+                <div class="quick-view">
+                    <a title="收藏" class="heart" th:href="|javascript:addCollect('${product.skus[0].id}','${session.currentUser eq null ?'':session.currentUser.id}')|"></a>
+                    <a title="比较" class="compare" th:href="|javascript:addComparisonTable('${product.skus[0].id}')|"></a>
+                    <a title="查看" class="search" th:href="@{/product/detail(productId=${product.id},skuId=${product.skus[0].id})}"></a>
+                </div>
+                <div class="add-to-cart">
+                    <a class="btn-add-cart" title="加入购物车" th:href="|javascript:addTrolley('${product.skus[0].id}')|">加入购物车</a>
+                </div>
+            </div>
+            <div class="right-block">
+                <h5 class="product-name"><a
+                        th:href="@{/product/detail(productId=${product.id},skuId=${product.skus[0].id})}"
+                        th:text="${product.productName}">披风</a></h5>
+                <div class="product-star">
+                    <i class="fa fa-star" th:if="${product.skus[0].skuRank%1 eq 0}"
+                       th:each="skuRank:${#numbers.sequence(1, product.skus[0].skuRank)}"></i>
+                    <i class="fa fa-star" th:unless="${product.skus[0].skuRank%1 eq 0}"
+                       th:each="skuRank:${#numbers.sequence(1, product.skus[0].skuRank)}"></i>
+                    <i class="fa" th:unless="${product.skus[0].skuRank%1 eq 0}"
+                       th:classappend="${product.skus[0].skuRank%1 eq 0?'fa-star':'fa-star-half-o'}"></i>
+                </div>
+                <div class="content_price">
+                    <span class="price product-price" th:text="|￥${product.skus[0].skuPrice}|">￥38,95</span>
+                    <span class="price old-price" th:text="|￥${product.skus[0].skuMarketPrice}|">￥52,00</span>
+                </div>
+            </div>
+        </div>
+    </li>
+</ul>
+</body>
+<!--水平切换插件-->
+<script type="text/javascript" th:src="@{/js/theme-script.js}"></script>
+<script type="text/javascript" th:src="@{/js/main.js}"></script>
+</html>

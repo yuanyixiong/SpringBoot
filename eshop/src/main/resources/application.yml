@@ -1,0 +1,41 @@
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://localhost:3306/eshop?characterEncoding=UTF-8&serverTimezone=Hongkong
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: root
+
+  thymeleaf:
+    cache: false
+
+logging:
+  level:
+    online.shixun.demo.eshop.module: debug
+system:
+  page:
+    size: 15               #常规分页
+    productSize: 18       #商品列表分页
+    orderSize: 8          #订单列表分页
+    orderItmeSize: 12    #订单项分页
+    collectSize: 8        #收藏列表分页
+    collectItmeSize: 12  #收藏项分页
+  file:
+    images:
+      service:
+        nginxVisitURL: http://127.0.0.1:9001/ #文件服务器访问地址
+  java:
+    qq:
+      loginName: 1944289126 #QQ账号
+      password: innovaee888 #QQ密码
+    mail:
+      from: 896778954@qq.com
+      username: 896778954@qq.com
+      password: ibnkhyeoqccobfhi
+      title: 轻实训电子商务平台账户激活
+      html:
+        activate: <h3>默认密码:123456<h3><br/><a href="http://localhost:8080/user/activate?email=email&id=userId">点击激活</a>
+        register: <h1>激活失败</h1><br/><a href="http://localhost:8080/login">点击注册</a>
+      login:
+        loginUrl: http://localhost:8080/login
+        loginPassword: 123456

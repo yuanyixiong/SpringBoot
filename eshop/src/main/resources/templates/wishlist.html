@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<!--CSS-->
+<head th:include="/fragment/css::css('轻实训电子商务平台-清单列表')"></head>
+<style type="text/css">
+    /*input data 样式扩展*/
+    input[type="date"]:before {
+        color: #A9A9A9;
+        content: attr(placeholder);
+    }
+
+    input[type="date"].full:before {
+        color: black;
+        content: "" !important;
+    }
+</style>
+<body class="product-page">
+<!-- header头部 -->
+<header id="header" th:replace="fragment/header::header"></header>
+<div class="columns-container">
+    <div class="container" id="columns">
+        <div class="breadcrumb clearfix">
+            <a class="home" th:href="@{/}" title="Return to Home">首页</a>
+            <span class="navigation-pipe">&nbsp;</span>
+            <a href="#" title="Return to Home">我的账户</a>
+            <span class="navigation-pipe">&nbsp;</span>
+            <span class="navigation_page">我的清单</span>
+        </div>
+        <div class="row">
+            <div class="column col-xs-12 col-sm-3" id="left_column">
+                <div id="hot" class="block left-module">
+                    <!--//jQuery load 加载畅销产品-->
+                </div>
+                <div id="commend" class="block left-module">
+                    <!--//jQuery load 加载店家推荐-->
+                </div>
+                <div id="new" class="block left-module">
+                    <!--//jQuery load 加载新品特惠-->
+                </div>
+            </div>
+            <div class="center_column col-xs-12 col-sm-9" id="center_column">
+                <h2 class="page-heading">
+                    <a class="page-heading-title2  glyphicon glyphicon-list-alt "
+                       th:classappend="${title} eq 'collect'?'text-primary':''" href="javascript:initCollects(1)"
+                       name="collect">我的收藏</a>
+                    <a class="page-heading-title2 glyphicon glyphicon-shopping-cart"
+                       th:classappend="${title} eq 'order'?'text-primary':''" href="javascript:initOrders(1)"
+                       name="order">我的订单</a>
+                </h2>
+                <div id="table">
+                    <!--//jQuery load 加载列表-->
+                </div>
+                <div id="item">
+                    <!--//jQuery load 加载列表项-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 页底 -->
+<footer id="footer" th:replace="fragment/footer::footer"></footer>
+<a href="#" class="scroll_top" title="回到顶部">回到顶部</a>
+<!--JS-->
+<div th:replace="/fragment/js::js"></div>
+<script type="text/javascript" th:inline="javascript">
+
+    var userId = /*[[${session.currentUser.id}]]*/null;//当前登陆的用户
+
+    //jQuery load 加载畅销产品
+    $("#hot").load("/recommend/hotProducts");
+
+    //jQuery load 加载店家推荐
+    $("#commend").load("/recommend/commendProducts");
+
+    //jQuery load 加载新品特惠
+    $("#new").load("/recommend/newProductsDetail");
+
+
+    //样式条件部分样式控制
+    $(".page-heading-title2").on("click", function () {
+        $(".page-heading-title2").each(function (index, obj) {
+            $(obj).removeClass("text-primary");
+        });
+        $(this).addClass("text-primary");
+    });
+
+    function initOrders(pageNum) {
+        //jQuery load 加载订单
+        $("#table").load("/order/getOrders?" + $.param({
+            "pageNum":pageNum,
+            "isDel": 2,
+            "userId": userId,
+            "action": "all"
+        }), function () {
+            //jQuery load 加载订单项
+            $("#table tbody tr:eq(0)").addClass("success");
+            var orderId = $("#table tbody tr td:eq(0) span[value]").attr("value");
+            $("#item").load("/orderItem/getOrderItems?orderId=" + orderId);
+        });
+    }
+
+    function initCollects(pageNum) {
+        //jQuery load 收藏列表
+        $("#table").load("/collect/getCollects?" + $.param({
+            "pageNum":pageNum,
+            "isDel": 2,
+            "userId": userId,
+            "action": "all"
+        }), function () {
+            //jQuery load 收藏列表项
+            $("#table tbody tr:eq(0)").addClass("success");
+            var collectId = $("#table tbody tr td:eq(0)").text();
+            $("#item").load("/collectItem/getCollectItems?collectId=" + collectId);
+        });
+    }
+
+    $(function () {
+        //初始化订单、收藏页面
+        var title = /*[[${title}]]*/null;
+        if (title == 'collect') {
+            initCollects(1);
+        } else {
+            initOrders(1);
+        }
+    });
+</script>
+</body>
+
+</html>

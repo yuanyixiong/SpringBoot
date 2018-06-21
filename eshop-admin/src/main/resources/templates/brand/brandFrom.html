@@ -1,0 +1,135 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<div class="tables-main">
+    <ol class="breadcrumb">
+        <li><a th:href="@{/index}">首页</a></li>
+        <li><a href="#">商品模块</a></li>
+        <li class="active"><a href="javascript:loadHTML('/shopping/mall/brand/main')">品牌管理</a></li>
+        <li th:switch="${action}">
+            <a href="#" th:case="add">添加</a>
+            <a href="#" th:case="edit">编辑</a>
+            <a href="#" th:case="info">详情</a>
+        </li>
+    </ol>
+    <div class="chrt-inner grid-1 col-xs-12 ">
+        <div class="form-body col-xs-12 col-xs-offset-2">
+            <form class="form-horizontal">
+                <div class="form-group  has-feedback col-xs-8">
+                    <label for="id" class="control-label">品牌编号:</label>
+                    <input id="id" name="id" class="form-control" type="text" />
+                    <span class="glyphicon form-control-feedback" aria-hidden="true"></span>
+                    <span class="sr-only">(error)</span>
+                </div>
+                <div class="form-group  has-feedback col-xs-8">
+                    <label for="brandName" class="control-label">品牌名称:</label>
+                    <input id="brandName" name="brandName" class="form-control" type="text" />
+                    <span class="glyphicon  form-control-feedback" aria-hidden="true"></span>
+                    <span class="sr-only">(error)</span>
+                </div>
+                <div class="form-group  has-feedback col-xs-8">
+                    <label for="brandLogo" class="control-label">品牌Logo:</label>
+                    <input id="brandLogo" name="brandLogo" class="form-control" type="text" />
+                    <span class="glyphicon  form-control-feedback" aria-hidden="true"></span>
+                    <span class="sr-only">(error)</span>
+                </div>
+                <div class="form-group  has-feedback col-xs-8">
+                    <label class="control-label">是否移除:</label>
+                    <div  class="radio-inline">
+                        <label>
+                            <input type="radio" value="1" name="isDel" />已删
+                        </label>
+                    </div>
+                    <div class="radio-inline">
+                        <label>
+                            <input type="radio" value="2"  name="isDel" checked="checked"/>未删
+                        </label>
+                    </div>
+                    <span class="glyphicon  form-control-feedback" aria-hidden="true"></span>
+                    <span class="sr-only">(error)</span>
+                </div>
+                <div class="form-group  has-feedback col-xs-8">
+                    <label for="brandDescription" class="control-label">备注:</label>
+                    <input id="brandDescription" name="brandDescription" class="form-control" type="text" />
+                    <span class="glyphicon  form-control-feedback" aria-hidden="true"></span>
+                    <span class="sr-only">(error)</span>
+                </div>
+                <div class="form-group  has-feedback col-xs-8" th:classappend="${(action eq 'add')or (action eq 'edit')?'hide':'' }">
+                    <label for="createTime" class="control-label">创建时间:</label>
+                    <input id="createTime" name="createTime" class="form-control" type="date" />
+                    <span class="glyphicon  form-control-feedback" aria-hidden="true"></span>
+                    <span class="sr-only">(error)</span>
+                </div>
+                <div class="form-group  has-feedback col-xs-8" th:classappend="${(action eq 'add')or (action eq 'edit')?'hide':'' }">
+                    <label for="updateTime" class="control-label">更新时间:</label>
+                    <input id="updateTime" name="updateTime" class="form-control" type="date" />
+                    <span class="glyphicon  form-control-feedback" aria-hidden="true"></span>
+                    <span class="sr-only">(error)</span>
+                </div>
+                <div class="col-xs-8">
+                    <button type="button" class="btn btn-success" th:if="${action eq 'add' or action eq 'edit'}" sign="save">保存</button>
+                    <button type="button" class="btn btn-info" sign="back">返回</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+</div>
+<!--模块JS公共变量-->
+<script type="text/javascript" th:inline="javascript" >
+    //品牌模块from页面链接操作的url
+    var saveUrl = "/shopping/mall/brand/save"; //保存、修改公用此URL
+    var mainUrl = "/shopping/mall/brand/main"; //返回模块主页面的URL
+    var inspectRepeatUrl = "/shopping/mall/brand/inspectRepeat"; //编号重复验证的URL
+    var loadParentNameUrl="/shopping/mall/brand/getModel";//加载父节点名称的URL
+
+    // 活动类型
+    var action = [[${action}]];
+</script>
+<!--表单数据初始化-->
+<script type="text/javascript" th:inline="javascript" th:if="${model}">
+    var $model;
+    $(function(){
+        if(action == "info" || action == "edit") {
+            //加载数据
+            //取出页面的表单dom
+            $model = [
+                $("#id"),
+                $("#brandName"),
+                $("#brandLogo"),
+                $("input[name='isDel']"),
+                $("#brandDescription"),
+                $("#createTime"),
+                $("#updateTime")
+            ];
+        }
+
+
+        //浏览详情，需要赋值
+        if (action == "info" || action == "edit") {
+            //给表单dom赋值
+            $model[0].val(/*[[${model.id}]]*/null);
+            $model[1].val(/*[[${model.brandName}]]*/null);
+            $model[2].val(/*[[${model.brandLogo}]]*/null);
+
+            //单选
+            if(/*[[${model.isDel eq 1}]]*/null) {
+                $model[3].filter("[type='radio'][name='isDel'][value='1']").attr("checked", true);
+            }else{
+                $model[3].filter("[type='radio'][name='isDel'][value='2']").attr("checked", true);
+            }
+
+            $model[4].val(/*[[${model.brandDescription}]]*/null);
+            if(/*[[${model.createTime}]]*/null) {
+                $model[5].val(new Date(/*[[${model.createTime}]]*/).format("yyyy-MM-dd"));
+            }
+            if(/*[[${model.updateTime}]]*/null) {
+                $model[6].val(new Date(/*[[${model.updateTime}]]*/).format("yyyy-MM-dd"));
+            }
+        }
+    });
+</script>
+<!--表单页面通用JS 表单数据初始化-->
+<script type="text/javascript" th:inline="javascript" th:src="@{/js/fromInit.js}" th:if="${model}"></script>
+<!--表单页面通用JS 表单事件-->
+<script type="text/javascript" th:inline="javascript" th:src="@{/js/fromClick.js}" ></script>
+<!--bootstrap jquery下拉树插件的JS-->
+<script type="text/javascript" th:src="@{/js/treeview.js}" ></script>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<!--//jQuery load 加载评论-->
+<!-- 商品搜索列表页面(category)你可能喜欢[进行中][历史行为]jquery load 加载的模板 -->
+<p class="title_block">今日最大牌</p>
+<div class="block_content">
+    <ul class="products-block">
+        <li th:each="product,eachState:${products}">
+            <div class="products-block-left">
+                <a th:href="@{/product/detail(productId=${product.id},skuId=${product.skus[0].id})}">
+                    <img th:src="${#image.getImage(product.imgs[0].imgUrl,0)}" src="/images/product-100x122.jpg">
+                </a>
+            </div>
+            <div class="products-block-right">
+                <p class="product-name">
+                    <a th:href="@{/product/detail(productId=${product.id},skuId=${product.skus[0].id})}" th:text="${product.productName}">女士吊带衫</a>
+                </p>
+                <p class="product-price" th:text="|￥${product.skus[0].skuPrice}|">￥38,95</p>
+                <p class="product-star">
+                    <i class="fa fa-star" th:if="${product.skus[0].skuRank%1 eq 0}"  th:each="skuRank:${#numbers.sequence(1, product.skus[0].skuRank)}"></i>
+                    <i class="fa fa-star" th:unless="${product.skus[0].skuRank%1 eq 0}"  th:each="skuRank:${#numbers.sequence(1, product.skus[0].skuRank)}"></i>
+                    <i class="fa" th:unless="${product.skus[0].skuRank%1 eq 0}"  th:classappend="${product.skus[0].skuRank%1 eq 0?'fa-star':'fa-star-half-o'}" ></i>
+                </p>
+            </div>
+        </li>
+    </ul>
+    <div class="products-block">
+        <div class="products-block-bottom">
+            <a class="link-all" href="#">查看更多</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>

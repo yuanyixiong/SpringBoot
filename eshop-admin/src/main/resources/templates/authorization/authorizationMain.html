@@ -1,0 +1,484 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<div class="tables-main">
+    <ol class="breadcrumb">
+        <li><a th:href="@{/index}">首页</a></li>
+        <li><a href="#">系统模块</a></li>
+        <li class="active"><a href="javascript:loadHTML('/system/authorization/main')">授权中心</a></li>
+    </ol>
+
+    <!--//模态框-->
+    <div class="modal fade" id="searchUserNmae" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        &times;
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel">
+                        查询用户
+                    </h4>
+                </div>
+                <div class="modal-body form-body col-xs-12 col-xs-offset-2">
+                    <form class="form-horizontal" id="usersParam">
+                        <div class="form-group  has-feedback col-xs-8">
+                            <label for="id" class="control-label">用户编号:</label>
+                            <input id="id" name="id" class="form-control" type="text"/>
+                        </div>
+                        <div class="form-group  has-feedback col-xs-8">
+                            <label for="userEmail" class="control-label">用户邮箱:</label>
+                            <input id="userEmail" name="userEmail" class="form-control" type="text"/>
+                        </div>
+                        <div class="form-group  has-feedback col-xs-8">
+                            <label for="userLoginName" class="control-label">登陆账号:</label>
+                            <input id="userLoginName" name="userLoginName" class="form-control" type="text"/>
+                        </div>
+                        <div class="form-group  has-feedback col-xs-8">
+                            <label for="userNicakName" class="control-label">用户昵称:</label>
+                            <input id="userNicakName" name="userNicakName" class="form-control" type="text"/>
+                        </div>
+                        <div class="form-group  has-feedback col-xs-8">
+                            <label for="userRealName" class="control-label">真实姓名:</label>
+                            <input id="userRealName" name="userRealName" class="form-control" type="text"/>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success hide"></button>
+                    <button type="button" class="btn btn-success" data-dismiss="modal" sign="search">
+                        <span class="glyphicon glyphicon-search" aria-hidden="true"></span>查询
+                    </button>
+                    <button type="button" class="btn btn-success" data-dismiss="modal">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>关闭
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="chrt-inner grid-1">
+        <div class="bottom-grids">
+            <div class="dev-table">
+
+                <!--//用户-->
+                <div class="col-lg-5 dev-col">
+                    <div id="users_toolbar" class="btn-group">
+                        <button type="toolbar" class="btn btn-info" data-toggle="modal" data-target="#searchUserNmae">
+                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>查询
+                        </button>
+                        <button type="toolbar" class="btn btn-info" sign="authorizationRole">
+                            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>授权
+                        </button>
+                        <button type="toolbar" class="btn btn-info" sign="share">
+                            <span class="glyphicon glyphicon-share" aria-hidden="true"></span>重置
+                        </button>
+                    </div>
+                    <table id="users" data-toggle="table" class="col-md-8">
+                        <thead>
+                        <tr>
+                            <th data-field="name">名称</th>
+                        </tr>
+                        </thead>
+                    </table>
+                    <div class="clearfix"></div>
+                </div>
+
+                <!--//角色-->
+                <div class="col-lg-4 dev-col mid">
+                    <div id="roles_toolbar" class="btn-group">
+                        <button type="toolbar" class="btn btn-info" sign="authorizationResource">
+                            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>授权
+                        </button>
+                    </div>
+                    <table id="roles" data-toggle="table">
+                        <thead>
+                        <tr>
+                            <th data-field="name">名称</th>
+                        </tr>
+                        </thead>
+                    </table>
+                    <div class="clearfix"></div>
+                </div>
+
+                <!--//资源-->
+                <div class="col-lg-3 dev-col">
+                    <div id="resources"></div>
+                    <div class="clearfix"></div>
+                </div>
+
+                <div class="clearfix"></div>
+            </div>
+        </div>
+
+    </div>
+    <div class="clearfix"></div>
+</div>
+<!--bootstrap-table-->
+<script type="text/javascript">
+    var userId;//当前选中的用户Id[授权的用户编号]
+    var roleId;//当前选中的角色Id[授权的角色编号]
+    /**
+     * 初始化用户/角色
+     * @param toolbarId
+     * @param tableId
+     * @param url
+     * @param columns
+     */
+    function initBootstrapTable(toolbarId, tableId, url, columns) {
+        $(tableId).bootstrapTable({
+            toolbar: toolbarId, //工具按钮用哪个容器
+            method: "get",
+            url: url, // 获取表格数据的url
+            dataType: "json",//	服务器返回的数据类型
+            undefinedText: "暂无数据",
+            cache: false, // 设置为 false 禁用 AJAX 数据缓存， 默认为true
+            striped: true,  //表格显示条纹，默认为false
+            pagination: true, // 在表格底部显示分页组件，默认false
+            paginationLoop: true,//启用分页条无限循环的功能
+            //pageList: [5, 10, 15, 20], // 设置可供选择的页面数据条数。设置为All 则显示所有记录
+            pageSize: 10, // 页面数据条数
+            pageNumber: 1, // 首页页码
+            sidePagination: 'server', // 设置为服务器端分页
+            search: false,//启用搜索框
+            strictSearch: false,//是否启用精准搜索
+            searchOnEnterKey: false,//设置为 true时，按回车触发搜索方法，否则自动触发搜索方法
+            showRefresh: true,//显示 刷新按钮
+            clickToSelect: tableId == "#users" ? true : false,//点击行时，自动选择rediobox 和 checkbox
+            singleSelect: false,//禁止多选
+            uniqueId: "id",//每一行的唯一标识，一般为主键列
+            showToggle: false,//是否显示详细视图和列表视图的切换按钮
+            cardView: false,//是否显示详细视图
+            detailView: false,//是否显示父子表
+            queryParams: function (params) {
+                // 请求服务器数据时发送的参数，可以在这里添加额外的查询参数，返回false则终止请求
+                console.log(params);
+                return {
+                    search: params.params,
+                    sort: params.sort,// 要排序的字段
+                    order: params.order,// 排序规则
+                    offset: params.offset,// 每页显示数据的开始行号
+                    limit: params.limit// 每页要显示的数据条数
+                }
+            },
+            sortName: 'id', // 要排序的字段
+            sortable: true,//启用排序
+            sortOrder: 'asc', // 排序规则
+            columns: columns,//列格式
+            showColumns: true,//是否显示所有的列（选择显示的列）
+            minimumCountColumns: 0,//最少允许的列数
+            onLoadSuccess: function (data) {
+                if (tableId == "#users") {
+                    //默认选中第一个用户
+                    $(tableId).find('tbody tr:eq(0)').addClass("success");
+                    //初始化角色数据，默认初始化选中的用户角色
+                    userId = data.rows[0].id;
+                    $('#roles').bootstrapTable('refresh', {url: '/system/authorization/roles?userId=' + userId});
+                } else if (tableId == "#roles") {
+                    roleId=null;
+                    //默认选中列表中用户拥有的第一个身份
+                    for (var i = 0; i < data.rows.length; i++) {
+                        if (data.rows[i].state) {
+                            $(tableId).find("tbody tr:eq(" + i + ")").addClass("success");
+                            roleId = data.rows[i].id;
+                            break;
+                        }
+                    }
+                    //初始化资源数据，默认初始化第一个选中的角色的资源
+                    loadTreeview($.param({"roleId": roleId}));
+                }
+                return false;
+            }
+        });
+
+        //点击选中行，改变选中行的背景颜色
+        $(tableId).on('click-row.bs.table', function (e, row, element) {
+            $(tableId).find('tr').removeClass("success");//移除当前表格所有选中颜色
+            $(element).addClass('success');//给当前单击的行添加颜色样式
+            if (tableId == "#roles") {
+                //单击角色表格刷新资源树信息
+                roleId = row.id;
+                loadTreeview($.param({"roleId": roleId}));
+            } else if (tableId == "#users") {
+                //单击用户表格刷新角色表格信息
+                userId = row.id;
+                $('#roles').bootstrapTable('refresh', {url: '/system/authorization/roles?userId=' + userId});
+            }
+        });
+    }
+</script>
+<!--用户 bootstrap-table-->
+<script type="text/javascript">
+    var columns = [
+        {
+            radio: true,//单选框
+            align: 'center', // 左右居中
+            valign: 'middle', // 上下居中
+            formatter: function stateFormatter(value, row, index) {
+                //默认选中第一个
+                if (index == 0) {
+                    return {
+                        disabled: false,//设置是否可用
+                        checked: true//设置选中
+                    };
+                }
+            }
+        },
+        {
+            field: 'id', // 返回json数据中的name
+            title: '编号', // 表格表头显示文字
+            align: 'center', // 左右居中
+            valign: 'middle', // 上下居中
+            visible: false //显示或隐藏该列， 默认显示
+        },
+        {
+            field: 'userEmail', title: '邮箱', align: 'center', valign: 'middle', visible: false
+        },
+        {
+            field: 'userLoginName', title: '账号', align: 'center', valign: 'middle', visible: true
+        },
+        {
+            field: 'userNicakName', title: '昵称', align: 'center', valign: 'middle', visible: true
+        },
+        {
+            field: 'userRealName', title: '真实姓名', align: 'center', valign: 'middle', visible: true
+        }
+    ];
+    $(function () {
+        initBootstrapTable("#users_toolbar", "#users", "/system/authorization/users", columns);
+    });
+</script>
+<!--角色 bootstrap-table-->
+<script type="text/javascript">
+    var columns = [
+        {
+            checkbox: true,//复选框
+            align: 'center', // 左右居中
+            valign: 'middle', // 上下居中
+            formatter: function stateFormatter(value, row, index) {
+                if (row.state == true) {
+                    return {
+                        disabled: false,//设置是否可用
+                        checked: true//设置选中
+                    };
+                }
+                return {
+                    disabled: false,//设置是否可用
+                    checked: false//设置选中
+                };
+
+            }
+        },
+        {
+            field: 'id', title: '编号', align: 'center', valign: 'middle', visible: false
+        },
+        {
+            field: 'roleName', title: '角色关键字', align: 'center', valign: 'middle', visible: false
+        },
+        {
+            field: 'roleDescription', title: '角色身份', align: 'center', valign: 'middle'
+        }
+    ];
+    $(function () {
+        //初始化空角色表格
+        initBootstrapTable("#roles_toolbar", "#roles", null, columns);
+    });
+</script>
+<!--资源 bootstrap-treeview-->
+<script type="text/javascript">
+    var $tree = $("#resources");
+
+    /**
+     * 初始化资源
+     * */
+    function loadTreeview(param) {
+        $.ajax({
+            url: "/system/authorization/resources",
+            type: "get",
+            data: param,
+            dataType: "json",
+            success: function (json) {
+                //树加载数据
+                initTreeview(json);
+            },
+            error: function () {
+                console.log("失败");
+            }
+        });
+    }
+
+    function initTreeview(data) {
+        $tree.treeview({
+            data: data,
+            showIcon: true, //是否显示图片
+            showCheckbox: true,//是否显示复选框
+            levels: 2, //默认展开级别
+            onNodeChecked: function (event, node) {
+                console.log("一个节点被checked");
+                //获得当前节点的所有子节点
+                var nodeIds = [];
+                getTreeViewAllChildren(node, nodeIds);
+                //子节点全部选中
+                $(this).treeview("checkNode", [nodeIds, {silent: true}]);
+
+                //归当前节点的所有父节点，控制父节点选中，取消选中
+                isAllParentNode(node);
+            },
+            onNodeUnchecked: function (event, node) {
+                console.log("一个节点被unchecked");
+                //获得当前节点的所有子节点
+                var childrenNodeIds = [];
+                getTreeViewAllChildren(node, childrenNodeIds);
+                //子节点全部取消选中
+                $(this).treeview('uncheckNode', [childrenNodeIds, {silent: false}]);
+
+                //归当前节点的所有父节点，控制父节点选中，取消选中
+                isAllParentNode(node);
+            },
+            onNodeExpanded: function (event, node) {
+                console.log("一个节点被展开");
+            },
+            onNodeCollapsed: function (event, node) {
+                console.log("一个节点被折叠");
+            },
+            onNodeSelected: function (event, node) {
+                console.log("一个节点被选择");
+                console.log(node.id + "-" + node.text);
+            }
+        });
+    }
+
+    /**
+     * 获得当前节点的所有子节点
+     * @param node 当前节点
+     * @param nodeIds 存储找到的子节点id
+     */
+    function getTreeViewAllChildren(node, nodeIds) {
+        for (var childrenIndex in node.nodes) {
+            var childrenNode = node.nodes[childrenIndex];
+            nodeIds.push(childrenNode.nodeId);
+            if (childrenNode.nodes) {
+                getTreeViewAllChildren(childrenNode, nodeIds);
+            }
+        }
+    }
+
+    /**
+     * 递归当前节点的所有父节点，控制父节点选中，取消选中
+     * */
+    function isAllParentNode(node) {
+        if (node.parentId > -1) {
+            if (isParentNodeAlllChildren(node)) {
+                $tree.treeview("checkNode", [node.parentId, {silent: true}]);
+            } else {
+                $tree.treeview("uncheckNode", [node.parentId, {silent: true}]);
+            }
+            var parentNode = $tree.treeview("getNode", node.parentId);
+            isAllParentNode(parentNode);
+        }
+    }
+
+    /**
+     * 验证同辈节点，如果存在任意一个选中的返回true反之false
+     * @param node
+     * @returns {*}
+     */
+    function isParentNodeAlllChildren(node) {
+        var parentNode = $tree.treeview("getNode", node.parentId);
+        for (var childrenIndex in parentNode.nodes) {
+            var childrenNode = parentNode.nodes[childrenIndex];
+            if (childrenNode.state.checked == true) {
+                return childrenNode.state.checked;
+            }
+        }
+        return false;
+    }
+</script>
+<!--全局按钮保存/重置-->
+<script type="text/javascript">
+    $(function () {
+        $("button[sign='search']").on("click", function () {
+            //自定义参数
+            var usersParam = $("#usersParam").serialize();
+            $('#users').bootstrapTable('refresh', {url: '/system/authorization/users?' + usersParam});
+        });
+
+        <!--给用户授权角色-->
+        $("button[sign='authorizationRole']").on("click", function () {
+
+            console.log("给用户授权角色");
+
+            //获得role 所有选中的数据
+            var roles_selects = $('#roles').bootstrapTable('getSelections');
+
+            //授予的角色权限编号
+            var roleIdArray = new Array();
+            $(roles_selects).each(function (index, obj) {
+                roleIdArray.push(obj.id);
+            });
+
+            //给用户授权角色
+            $.ajax({
+                url: "/system/authorization/authorizationRole",
+                type: "post",
+                data: $.param({"userId": userId, "roleIds": roleIdArray.join(",")}),
+                dataType: "json",
+                success: function (responseData) {
+                    if (responseData.status == "-1") {
+                        console.log(responseData.data);
+                        alert(responseData.data);
+                        return;
+                    }
+                    alert(responseData.data);
+                },
+                error: function () {
+                    console.log("失败");
+                }
+            });
+
+        });
+        <!--授权资源-->
+        $("button[sign='authorizationResource']").on("click", function () {
+
+            console.log("给角色授权资源");
+
+            //获得resource 所有选中的数据
+            var resources_selects = $('#resources').treeview('getChecked');
+
+            //授予的资源权限编号
+            var resourcesIdArray = new Array();
+            $(resources_selects).each(function (index, obj) {
+                resourcesIdArray.push(obj.id);
+            });
+
+            //给角色授权资源
+            $.ajax({
+                url: "/system/authorization/authorizationResource",
+                type: "post",
+                data: $.param({"roleId": roleId, "resourceIds": resourcesIdArray.join(",")}),
+                dataType: "json",
+                success: function (responseData) {
+                    if (responseData.status == "-1") {
+                        console.log(responseData.data);
+                        alert(responseData.data);
+                        return;
+                    }
+                    alert(responseData.data);
+                },
+                error: function () {
+                    console.log("失败");
+                }
+            });
+        });
+        $("button[sign='share']").on("click", function () {
+            $("#id").val("");
+            $("#userEmail").val("");
+            $("#userLoginName").val("");
+            $("#userNicakName").val("");
+            $("#userRealName").val("");
+            console.log("重置");
+            $('#users').bootstrapTable('refresh', {url: '/system/authorization/users'});
+        });
+    })
+    ;
+</script>

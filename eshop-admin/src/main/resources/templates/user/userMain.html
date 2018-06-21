@@ -1,0 +1,89 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<div class="tables-main">
+    <ol class="breadcrumb">
+        <li><a th:href="@{/index}">首页</a></li>
+        <li><a href="#">系统模块</a></li>
+        <li class="active"><a href="javascript:loadHTML('/system/user/main')">用户管理</a></li>
+        <li><a href="#" id="triggerInfo">桌面列表</a></li>
+    </ol>
+    <div class="chrt-inner grid-1">
+        <div class="form-body ">
+            <div data-example-id="simple-form-inline">
+                <form class="form-inline" th:action="@{/system/user/getPages}" method="get">
+                    <input type="hidden" class="form-control" name="page" value="0" id="page"/>
+                    <input id="is_del" type="hidden" class="form-control" name="isDel" th:value="2" />
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="userNicakName" placeholder="用户昵称" />
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="userRealName" placeholder="真实姓名" />
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="userLoginName" placeholder="登陆账号" />
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="userEmail" placeholder="邮箱">
+                    </div>
+                    <button type="button" class="btn btn-success" sign="search">查询</button>
+                    <button type="button" class="btn btn-info" sign="new">添加</button>
+                    <button type="button" class="btn btn-warning" sign="trigger">回收站</button>
+                </form>
+            </div>
+        </div>
+        <!--//这里显示数据-->
+        <table class="table table-hover">
+            <thead>
+            <tr class="info">
+                <th>序号</th>
+                <th>用户昵称</th>
+                <th>真实姓名</th>
+                <th>登陆账号</th>
+                <th>邮箱</th>
+                <th>性别</th>
+                <th>是否移除</th>
+                <th>最近更新时间</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody id="data">
+            </tbody>
+        </table>
+        <!--//这里显示分页-->
+        <div id="pagination" class="pagination"></div>
+    </div>
+    <div class="clearfix"></div>
+</div>
+<!--模块独有特性 JS -->
+<script type="text/javascript" th:inline="javascript">
+    //系统用户模块main页面链接操作的url
+    var saveUrl = "/system/user/from?action=add";//添加-跳转from页面URL,且指定多动类型为add
+    var editUrl = "/system/user/from?action=edit";//编辑-跳转from页面URL,且指定多动类型为edit
+    var infoUrl = "/system/user/from?action=info";//详情-跳转from页面URL,且指定多动类型为info
+    var getPagesUrl = "/system/user/getPages";//模块分页的URL
+    var deleteUrlReal = "/system/user/deleteReal";//分页列表真删除的URL
+    var deleteUrlFake = "/system/user/deleteFake";//分页列表假删除的URL
+    var deleteUrlRestore="/system/user/deleteUrlRestore";//分页列表删除的还原URL
+
+    //控制分页列表的按钮
+    var buttons=new Buttons(true,true,true,false,false,false,false);
+
+    /**
+     * 初始化一行数据
+     * @param model 单个数据对象
+     * @param serialNumber 当前行的序号
+     * @returns {Array}
+     */
+    function initRowValues(model, serialNumber) {
+        var id = model.id;
+        var userNicakName = model.userNicakName;
+        var userLoginName = model.userLoginName;
+        var userEmail = model.userEmail;
+        var userRealName = model.userRealName;
+        var userGender = model.userGender==1?"男":"女";
+        var isDel = model.isDel==1?"已删":"未删";
+        var updateTime = model.updateTime==null?new Date().NULL:new Date( model.updateTime).format("yyyy-MM-dd hh:mm:ss");
+        return new Array(serialNumber, userNicakName, userRealName, userLoginName, userEmail,userGender, isDel,updateTime, id);
+    }
+</script>
+<!--模块分页通用JS-->
+<script type="text/javascript" th:inline="javascript" th:src="@{/js/index.js}"></script>

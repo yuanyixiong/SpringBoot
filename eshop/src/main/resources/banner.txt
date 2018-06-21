@@ -1,0 +1,12 @@
+${AnsiColor.BRIGHT_GREEN}
+
+d888888b d8b   db d8b   db  .d88b.  db    db  .d8b.  d88888b d88888b 
+  `88'   888o  88 888o  88 .8P  Y8. 88    88 d8' `8b 88'     88'     
+   88    88V8o 88 88V8o 88 88    88 Y8    8P 88ooo88 88ooooo 88ooooo 
+   88    88 V8o88 88 V8o88 88    88 `8b  d8' 88~~~88 88~~~~~ 88~~~~~ 
+  .88.   88  V888 88  V888 `8b  d8'  `8bd8'  88   88 88.     88.     
+Y888888P VP   V8P VP   V8P  `Y88P'     YP    YP   YP Y88888P Y88888P                                                                              
+                       
+${AnsiColor.BRIGHT_RED}
+Application Version: ${application.version}${application.formatted-version}
+Spring Boot Version: ${spring-boot.version}${spring-boot.formatted-version}

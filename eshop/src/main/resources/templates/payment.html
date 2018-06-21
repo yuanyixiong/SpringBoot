@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<!--CSS-->
+<head th:include="/fragment/css::css('轻实训电子商务平台-付款')"></head>
+<body class="category-page">
+<!-- header头部 -->
+<header id="header" th:replace="fragment/header::header"></header>
+<div class="columns-container">
+    <div class="container" id="columns">
+        <div class="breadcrumb clearfix">
+            <a class="home" th:href="@{/}" title="Return to Home">首页</a>
+            <span class="navigation-pipe">&nbsp;</span>
+            <span class="navigation_page">订单提交</span>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 col-sm-3 col-xs-0"></div>
+            <div class="col-lg-4 col-sm-6 col-xs-12">
+                <h2>
+                    <img th:src="${#image.getImage('orderSubmit.png')}" width="50" height="50"/>
+                    订单提交成功
+                    <a th:href="@{/order/main}" class="text-primary">
+                        返回我的订单列表
+                    </a>
+                </h2>
+            </div>
+            <div class="col-lg-4 col-sm-3 col-xs-0"></div>
+        </div>
+        <div class="container">
+            <!--根据用户评价的商品进行推荐-->
+        </div>
+    </div>
+</div>
+<!-- 页底 -->
+<footer id="footer" th:replace="fragment/footer::footer"></footer>
+<a href="#" class="scroll_top" title="回到顶部">回到顶部</a>
+<!--JS-->
+<div th:replace="/fragment/js::js"></div>
+</body>
+</html>

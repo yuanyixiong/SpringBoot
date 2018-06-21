@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="online.shixun.demo.eshop.module.brand.mapper.EshopBrandMapper">
+
+    <!--//最小销售单元的ResultMap基础配置-->
+    <resultMap id="brandBaseResultMap" type="online.shixun.demo.eshop.dto.EshopBrand">
+        <id column="brand_id" property="id"></id>
+        <result column="brand_is_del" property="isDel"></result>
+        <result column="brand_create_time" property="createTime"></result>
+        <result column="brand_update_time" property="updateTime"></result>
+        <result column="brand_name" property="brandName"></result>
+        <result column="brand_description" property="brandDescription"></result>
+        <result column="brand_logo" property="brandLogo"></result>
+    </resultMap>
+
+    <!--最小销售单元的基础列:连表改名SQL-->
+    <sql id="brandBaseJoinRenameSQL">
+        brand.`id` as brand_id,
+        brand.`is_del` as brand_is_del,
+        brand.`update_time` as brand_update_time,
+        brand.`create_time` as brand_create_time,
+        brand.`brand_name`,
+        brand.`brand_description`,
+        brand.`brand_logo`
+    </sql>
+    <!--最小销售单元的基础列:单表未改名SQL-->
+    <sql id="brandBaseUnJoinRenameSQL">
+        brand.`id`,
+        brand.`is_del`,
+        brand.`update_time`,
+        brand.`create_time`,
+        brand.`brand_name`,
+        brand.`brand_description`,
+        brand.`brand_logo`
+    </sql>
+
+</mapper>

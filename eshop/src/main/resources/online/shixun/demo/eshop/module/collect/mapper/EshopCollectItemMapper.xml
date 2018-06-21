@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="online.shixun.demo.eshop.module.collect.mapper.EshopCollectItemMapper">
+
+    <resultMap id="collectItemBaseResultMap" type="online.shixun.demo.eshop.dto.EshopCollectItem">
+        <id property="id" column="collect_item_id"/>
+        <result property="collectId" column="collect_item_collect_id"/>
+        <result property="productId" column="collect_item_product_id"/>
+        <result property="colorId" column="collect_item_color_id"/>
+        <result property="sizeId" column="collect_item_size_id"/>
+
+        <association column="product_id" property="product" javaType="online.shixun.demo.eshop.dto.EshopProductWithBLOBs" resultMap="online.shixun.demo.eshop.module.product.mapper.EshopProductMapper.productWithBLOBsResultMap"/>
+    </resultMap>
+
+    <!--产品的基础列:连表改名SQL-->
+    <sql id="collectItemBaseJoinRenameSQL">
+        collect_item.`id` AS collect_item_id,
+        collect_item.`collect_id` AS collect_item_collect_id,
+        collect_item.`product_id` AS collect_item_product_id,
+        `color_id` AS collect_item_color_id,
+        `size_id` AS collect_item_size_id
+    </sql>
+    <!--产品的基础列:单表未改名SQL-->
+    <sql id="collectItemBaseUnJoinRenameSQL">
+      collect_item.`id`,collect_item.`collect_id`,collect_item.`product_id`,`color_id`,`size_id`
+    </sql>
+
+
+    <!--//收藏-->
+    <select id="getCollectItems" parameterType="online.shixun.demo.eshop.dto.EshopCollectItem" resultMap="collectItemBaseResultMap">
+        SELECT
+        <!--//收藏-->
+        <include refid="collectItemBaseJoinRenameSQL"/>,
+        <!--//产品-->
+        <include refid="online.shixun.demo.eshop.module.product.mapper.EshopProductMapper.productBaseJoinRenameSQL"/>,
+        <!--//图片-->
+        <include refid="online.shixun.demo.eshop.module.product.mapper.EshopImgMapper.imgBaseJoinRenameSQL"/>
+
+        FROM `eshop_product` product
+        INNER JOIN `eshop_img` img ON img.`product_id`=product.`id` AND img.`is_del`=2
+        INNER JOIN `eshop_collect_item` collect_item ON collect_item.`product_id`=product.`id`
+        WHERE collect_item.collect_id=#{collectId}
+    </select>
+
+</mapper>

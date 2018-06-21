@@ -1,0 +1,11 @@
+server:
+  port: 9000 #nginx文件服务器文件上传端口
+
+system:
+  file:
+    images:
+      service:
+        upload: F:/innovaeeGit/so-eshop/nginxService/resourcesfile/images/ #nginx 文件服务器目录
+
+
+

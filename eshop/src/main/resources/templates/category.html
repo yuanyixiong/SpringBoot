@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<!--CSS-->
+<head th:include="/fragment/css::css('轻实训电子商务平台-内容')"></head>
+<body class="category-page">
+<!-- 模态框 -->
+<div class="modal fade" id="messModal">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <!-- 模态框头部 -->
+            <div class="modal-header">
+                <h4 class="modal-title">提示</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <!-- 模态框主体 -->
+            <div class="modal-body">
+                <span id="mess"></span>
+            </div>
+            <!-- 模态框底部 -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- header头部 -->
+<header id="header" th:replace="fragment/header::header"></header>
+<div class="columns-container">
+    <div class="container" id="columns">
+        <!-- 面包屑 -->
+        <div class="breadcrumb clearfix">
+            <a class="home" th:href="@{/}" title="Return to Home">首页</a>
+            <span class="navigation-pipe">&nbsp;</span>
+            <span class="navigation_page" id="title"></span>
+        </div>
+        <div class="row">
+            <!-- 左边列内容-->
+            <div class="column col-xs-12 col-sm-3" id="left_column">
+                <div class="block left-module">
+                    <!-- 产品分类 -->
+                    <p class="title_block">产品分类</p>
+                    <div class="block_content">
+                        <div class="layered layered-category">
+                            <div class="layered-content">
+                                <ul id="classify" class="tree-menu">
+                                    <!--//jQuery Ajax加载产品分类-->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="block left-module">
+                    <p class="title_block">筛选</p>
+                    <div class="block_content">
+                        <div class="layered layered-filter-price">
+                            <!-- 类别筛选 -->
+                            <div class="layered_subtitle">类别</div>
+                            <div class="layered-content">
+                                <ul id="types" class="check-box-list">
+                                    <!--//jQuery Ajax加载类别-->
+                                </ul>
+                            </div>
+                            <!-- 价格筛选 -->
+                            <div class="layered_subtitle">价格</div>
+                            <div class="layered-content slider-range">
+                                <ul id="prices" class="check-box-list">
+                                    <!--//jQuery Ajax加载价格筛选-->
+                                </ul>
+                            </div>
+                            <!-- 颜色筛选 -->
+                            <div class="layered_subtitle">颜色</div>
+                            <div class="layered-content filter-color">
+                                <ul id="colors" class="check-box-list">
+                                    <!--//jQuery Ajax加载颜色-->
+                                </ul>
+                            </div>
+                            <!-- 品牌筛选-->
+                            <div class="layered_subtitle">品牌</div>
+                            <div class="layered-content filter-brand">
+                                <ul id="brands" class="check-box-list">
+                                    <!--//jQuery Ajax加载品牌-->
+                                </ul>
+                            </div>
+                            <!-- 尺码筛选 -->
+                            <div class="layered_subtitle">尺码</div>
+                            <div class="layered-content filter-size">
+                                <ul id="sizes" class="check-box-list">
+                                    <!--//jQuery Ajax加载尺码-->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 左边商品轮播图 -->
+                <div id="commend" class="block left-module">
+                    <!--//jQuery load 加载店家推荐-->
+                </div>
+                <!-- 特价商品 -->
+                <div id="bargain" class="block left-module">
+                    <!--//jQuery load 加载店家推荐-->
+                </div>
+                <!-- 商标 -->
+                <div class="block left-module">
+                    <p class="title_block">热门活动</p>
+                    <div class="block_content">
+                        <div class="tags">
+                            <a href="#" th:each="activity:${activitys}">
+                                <!--#math.random(5) 未自定义的Thymeleaf扩展对象-->
+                                <th:block th:switch="${#math.random(5)}">
+                                    <span th:case="1" class="level1" th:text="${activity.activityName}">宝姿开业钜惠</span>
+                                    <span th:case="2" class="level2" th:text="${activity.activityName}">宝姿开业钜惠</span>
+                                    <span th:case="3" class="level3" th:text="${activity.activityName}">宝姿开业钜惠</span>
+                                    <span th:case="4" class="level4" th:text="${activity.activityName}">宝姿开业钜惠</span>
+                                    <span th:case="5" class="level5" th:text="${activity.activityName}">宝姿开业钜惠</span>
+                                </th:block>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 右边的商品列表-->
+            <div class="center_column col-xs-12 col-sm-9" id="center_column">
+                <!--类别滑块[轮播图]-->
+                <div class="category-slider">
+                    <ul class="owl-carousel owl-style2" data-dots="false" data-loop="true" data-nav="true"
+                        data-autoplayTimeout="1000" data-autoplayHoverPause="true" data-items="1">
+                        <li th:each="slideshow:${slideshows}">
+                            <img th:src="${#image.getImage(slideshow.slideshowImage)}">
+                        </li>
+                    </ul>
+                </div>
+                <!--商品列表-->
+                <div id="products">
+                    <!--//jQuery load 加载商品列表-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 页底 -->
+<footer id="footer" th:replace="fragment/footer::footer"></footer>
+<a href="#" class="scroll_top" title="回到顶部">回到顶部</a>
+<!--JS-->
+<div th:replace="/fragment/js::js"></div>
+</body>
+<script type="text/javascript" th:inline="javascript">
+    //默认选中
+    //产品分类
+    var classifyChecked = /*[[${classifyChecked}]]*/"";
+    //类别
+    var typesChecked = /*[[${typesChecked}]]*/null;
+    //价格
+    var priceMax = /*[[${priceMax}]]*/1000;//商品价格限定区间0-priceMax
+    var currentPrice = /*[[${currentPrice}]]*/0;//当前商品的价格
+    //颜色
+    var colorsChecked = /*[[${colorsChecked}]]*/null;
+    //品牌
+    var brandsChecked = /*[[${brandsChecked}]]*/null;
+    //尺码
+    var sizesChecked = /*[[${sizesChecked}]]*/null;
+
+    //初始化
+    loadClassify();
+    loadTypes(classifyChecked);
+    loadPrices();
+    loadColors();
+    loadBrands();
+    loadSizes(classifyChecked);
+
+    //加载轮播图
+    /**
+     * 加载产品分类
+     */
+    function loadClassify() {
+        $.ajax({
+            url: "/type/getTypesByType",
+            data: $.param({"typeParentId": "root"}),
+            type: "get",
+            dataType: "json",
+            success: function (responseData) {
+                if (responseData.status == "-1") {
+                    console.log("失败");
+                    console.log(responseData.data);
+                    return;
+                }
+                $("#classify").empty();
+                for (var i in  responseData.data) {
+                    var $span = $("<span></span>");
+                    var $a = $("<a href='javascript:initScreen(\"" + responseData.data[i].id + "\")'></a>").text(responseData.data[i].typeName);
+                    var $li = $("<li></li>").attr("id", responseData.data[i].id).append($span).append($a);
+                    //选中
+                    if (classifyChecked) {
+                        if (classifyChecked == responseData.data[i].id) {
+                            $li.addClass("active");
+                        }
+                    }
+                    $("#classify").append($li);
+                }
+            },
+            error: function () {
+                console.log("失败");
+            }
+        });
+    }
+
+    //筛选
+    /**
+     * 加载类别
+     * @param typeParentId 加载类别的父级Id
+     */
+    function loadTypes(typeParentId) {
+        $.ajax({
+            url: "/type/getTypesByType",
+            data: $.param({"typeParentId": typeParentId}),
+            type: "get",
+            dataType: "json",
+            success: function (responseData) {
+                if (responseData.status == "-1") {
+                    console.log("失败");
+                    console.log(responseData.data);
+                    return;
+                }
+                $("#types").empty();
+                for (var i in  responseData.data) {
+                    var sign = "c" + i;
+                    var $input = $("<input type='checkbox' id='" + sign + "' name='types' value='" + responseData.data[i].id + "' />");
+                    //选中
+                    if (typesChecked && typesChecked.length > 0) {
+                        var isChecked = -1;
+                        for (var j in typesChecked) {
+                            if (typesChecked[j] == responseData.data[i].id) {
+                                isChecked = j;
+                                break;
+                            }
+                        }
+                        if (isChecked >= 0) {
+                            $input.attr("checked", "checked");
+                        }
+                    }
+                    var $span_1 = $("<span class='button'></span>");
+                    var $span_2 = $("<span class='count'></span>").text("(10)");
+                    var $lable = $("<label for='" + sign + "'></label>").append($span_1).append(responseData.data[i].typeName).append($span_2);
+                    var $li = $("<li></li>").append($input).append($lable);
+                    $("#types").append($li);
+                }
+            },
+            error: function () {
+                console.log("失败");
+            }
+        });
+    }
+
+    /**
+     * 加载价格
+     */
+    function loadPrices() {
+        //百分比设置区间%10+%20+%30+%40=%100
+        // 0-500
+        // %10	0		    50
+        // %20	50		    100+50
+        // %30	100+50		150+50+100
+        // %40	150+50+100	200+50+100+150
+        $("#prices").empty();
+        for (var i = 10; i <= 40; i += 10) {
+            var begin = recursion(i, 0);
+            var end = priceMax / 100 * i + recursion(i, 0);
+
+            var sign = "p" + i;
+            var $input = $("<input type='checkbox' id='" + sign + "' name='prices' min='" + begin + "' max='" + end + "' />");
+            //选中
+            if (currentPrice) {
+                if (begin <= currentPrice && currentPrice <= end) {
+                    $input.attr("checked", "checked");
+                }
+            }
+            var $lable = $("<label for='" + sign + "'></label>");
+            var $span_1 = $("<span class='button'></span>");
+            var $span_2 = $("<span class='count'></span>").text("(0)");
+            var $li = $("<li></li>");
+
+            $lable.append($span_1).append("￥" + begin + "-￥" + end).append($span_2);
+            $li.append($input).append($lable);
+            $("#prices").append($li);
+        }
+    }
+
+    //百分比设置区间%10+%20+%30+%40=%100
+    // 0-500
+    // %10	0		    50
+    // %20	50		    100+50
+    // %30	100+50		150+50+100
+    // %40	150+50+100	200+50+100+150
+    /***
+     * 百分比递归区域算法
+     */
+    function recursion(number, sum) {
+        number -= 10;
+        if (number == 0) {
+            return sum;
+        }
+        sum += priceMax / 100 * number;
+        return recursion(number, sum)
+    }
+
+    /**
+     * 加载颜色
+     */
+    function loadColors() {
+        $.ajax({
+            url: "/color/getColorsByColor",
+            data: $.param({}),
+            type: "get",
+            dataType: "json",
+            success: function (responseData) {
+                if (responseData.status == "-1") {
+                    console.log("失败");
+                    console.log(responseData.data);
+                    return;
+                }
+                $("#colors").empty();
+                for (var i in  responseData.data) {
+                    var sign = "color" + i;
+                    var $input = $("<input type='checkbox' id='" + sign + "' name='colors' value='" + responseData.data[i].id + "' />");
+                    //选中
+                    if (colorsChecked && colorsChecked.length > 0) {
+                        var isChecked = -1;
+                        for (var j in colorsChecked) {
+                            if (colorsChecked[j] == responseData.data[i].id) {
+                                isChecked = j;
+                                break;
+                            }
+                        }
+                        if (isChecked >= 0) {
+                            $input.attr("checked", "checked");
+                        }
+                    }
+                    var $span_1 = $("<span class='button'></span>");
+                    var $lable = $("<label for='" + sign + "'></label>").css("background", "#" + responseData.data[i].colorImgUrl).append($span_1);
+                    var $li = $("<li></li>").append($input).append($lable);
+                    $("#colors").append($li);
+                }
+            },
+            error: function () {
+                console.log("失败");
+            }
+        });
+    }
+
+    /**
+     *加载品牌
+     */
+    function loadBrands() {
+        $.ajax({
+            url: "/brand/getBrandsByBrand",
+            data: $.param({}),
+            type: "get",
+            dataType: "json",
+            success: function (responseData) {
+                if (responseData.status == "-1") {
+                    console.log("失败");
+                    console.log(responseData.data);
+                    return;
+                }
+                $("#brands").empty();
+                for (var i in  responseData.data) {
+                    var sign = "brand" + i;
+                    var $input = $("<input type='checkbox' id='" + sign + "' name='brands' value='" + responseData.data[i].id + "' />");
+                    //选中
+                    if (brandsChecked && brandsChecked.length > 0) {
+                        var isChecked = -1;
+                        for (var j in brandsChecked) {
+                            if (brandsChecked[j] == responseData.data[i].id) {
+                                isChecked = j;
+                                break;
+                            }
+                        }
+                        if (isChecked >= 0) {
+                            $input.attr("checked", "checked");
+                        }
+                    }
+                    var $span_1 = $("<span class='button'></span>");
+                    var $span_2 = $("<span class='count'></span>").text("(10)");
+                    var $lable = $("<label for='" + sign + "'></label>").append($span_1).append(responseData.data[i].brandName).append($span_2);
+                    var $li = $("<li></li>").append($input).append($lable);
+                    $("#brands").append($li);
+                }
+            },
+            error: function () {
+                console.log("失败");
+            }
+        });
+    }
+
+    /**
+     *加载尺码
+     */
+    function loadSizes(typeId) {
+        $.ajax({
+            url: "/size/getSizesBySize",
+            data: $.param({'id':typeId}),
+            type: "get",
+            dataType: "json",
+            success: function (responseData) {
+                if (responseData.status == "-1") {
+                    console.log("失败");
+                    console.log(responseData.data);
+                    return;
+                }
+                $("#sizes").empty();
+                for (var i in  responseData.data) {
+                    var sign = "size" + i;
+                    var $input = $("<input type='checkbox' id='" + sign + "' name='sizes' value='" + responseData.data[i].id + "' />");
+                    //选中
+                    if (sizesChecked && sizesChecked.length > 0) {
+                        var isChecked = -1;
+                        for (var j in sizesChecked) {
+                            if (sizesChecked[j] == responseData.data[i].id) {
+                                isChecked = j;
+                                break;
+                            }
+                        }
+                        if (isChecked >= 0) {
+                            $input.attr("checked", "checked");
+                        }
+                    }
+                    var $span_1 = $("<span class='button'></span>");
+                    var $lable = $("<label for='" + sign + "'></label>").append($span_1).append(responseData.data[i].sizeName);
+                    var $li = $("<li></li>").append($input).append($lable)
+                    $("#sizes").append($li);
+                }
+            },
+            error: function () {
+                console.log("失败");
+            }
+        });
+    }
+
+    /**
+     * 产品分类选项更改时[初始化筛选区域]
+     * @param typeParentId 加载类别的父级Id
+     */
+    function initScreen(typeParentId) {
+        //置空默认选中
+        //产品分类
+        classifyChecked = typeParentId;
+        //类别
+        typesChecked = new Array();
+        //价格
+        currentPrice = undefined;
+        //颜色
+        colorsChecked = new Array();
+        //品牌
+        brandsChecked = new Array();
+        //尺码
+        sizesChecked = new Array();
+
+        //初始化
+        loadTypes(typeParentId);
+        loadPrices();
+        loadColors();
+        loadBrands();
+        loadSizes(typeParentId);
+
+        //单击的对象添加选中效果
+        $("#classify li").each(function (index, obj) {
+            $(obj).removeClass("active");
+        });
+        $("#classify li#" + typeParentId).addClass("active");
+
+        //加载商品列表
+        $("#products").load("/product/getProducts?" + $.param({
+            "productName": $("#productName").val(), //产品名称
+            "type": classifyChecked                 //产品分类
+        }));
+    }
+
+    //筛选区域：类别、价格、颜色、品牌、尺码等选项发生单击时候 加载商品
+    $(document).off("click", "#types li input[type='checkbox']").on("click", "#types li input[type='checkbox']", {}, function () {
+        getScreenValues();
+    });
+    $(document).off("click", "#prices li input[type='checkbox']").on("click", "#prices li input[type='checkbox']", {}, function () {
+        getScreenValues();
+    });
+    $(document).off("click", "#colors li input[type='checkbox']").on("click", "#colors li input[type='checkbox']", {}, function () {
+        getScreenValues();
+    });
+    $(document).off("click", "#brands li input[type='checkbox']").on("click", "#brands li input[type='checkbox']", {}, function () {
+        getScreenValues();
+    });
+    $(document).off("click", "#sizes li input[type='checkbox']").on("click", "#sizes li input[type='checkbox']", {}, function () {
+        getScreenValues();
+    });
+
+    //数据加载，查询商品
+    function getScreenValues() {
+        //类别
+        typesChecked = getScreenValue("#types li input:checked");
+        //颜色
+        colorsChecked = getScreenValue("#colors li input:checked");
+        //品牌
+        brandsChecked = getScreenValue("#brands li input:checked");
+        //尺码
+        sizesChecked = getScreenValue("#sizes li input:checked");
+        //加载商品
+        loadProducts();
+    }
+
+    //类别、颜色、品牌、尺码 id 提取
+    function getScreenValue(expression) {
+        var ids = new Array();
+        $(expression).each(function (index, obj) {
+            ids.push($(obj).val());
+        });
+        return ids;
+    }
+
+    //价格数据提取
+    function getPricesValue() {
+        var prices = new Array();
+        $("#prices li input:checked").each(function (index, obj) {
+            var min = $(obj).attr("min");
+            var max = $(obj).attr("max");
+            prices.push(min + "-" + max);
+        });
+        return prices;
+    }
+
+    //推荐区域
+    //加载店家推荐
+    $("#commend").load("/recommend/commendProducts");
+    //加载今日最大牌
+    $("#bargain").load("/recommend/bargainProducts");
+
+    //加载商品列表
+    loadProducts();
+
+    function loadProducts(pageNum) {
+        $("#products").load("/product/getProducts?" + $.param({
+            "productName": $("#productName").val(), //产品名称
+            "pageNum": pageNum,                     //页码
+            "type": classifyChecked,                //产品分类
+            "types": typesChecked.join(","),        //类别
+            "prices": getPricesValue().join(","),   //价格
+            "colors": colorsChecked.join(","),      //颜色
+            "brands": brandsChecked.join(","),      //品牌
+            "sizes": sizesChecked.join(",")         //尺码
+        }), function () {
+            //路径标题[导航栏下的]
+            $("#title").text($("#classify li#" + classifyChecked).text());
+            //路径标题[产品列表中的]
+            $("#pageTitle").text($("#classify li#" + classifyChecked).text());
+        });
+    }
+</script>
+</html>
